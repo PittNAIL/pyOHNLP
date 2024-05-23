@@ -16,6 +16,8 @@ def parse_args() -> argparse.Namespace:
 #    parser.add_argument("--data_source", type=str, help="Note source", required=True, choices =
 #                        ['filesystem', 'database'])
 
+    parser.add_argument("--input_files", type=str, help="Note source", required=True, default = None)
+
     return parser.parse_args()
 
 
