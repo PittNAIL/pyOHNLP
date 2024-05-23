@@ -1,0 +1,28 @@
+TODO:
+Implement capability to read and write from DB
+Read and write from folder (file system)
+Read and write from .zip files
+Keep in mind it may not be a total match.. allow for the ability to go for instance:
+READ FROM DB WRITE TO .CSV
+READ FROM .CSV WRITE TO DATABASE
+READ FROM .ZIP WRITE TO DATABASE
+READ FROM .ZIP WRITE TO .CSV
+READ FROM .CSV WRITE TO .CSV
+READ FROM DB WRITE TO DB
+
+reading .zip should be done 'in stream' without extracting the .zip file into temporary folder if
+possible.
+
+Need metrics for
+> cpu
+> ram
+> time
+> accuracy
+
+Clean up the ConTextRules to be more representative of desired outputs.
+Need to create a mapping for:
+Experiencer (is it the patient, a family member, other)
+Certainty (is it positive, definitely not, possible, hypothetical)
+Temporality (is it a present condition? in family history? in patient history?)
+
+
