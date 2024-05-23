@@ -208,5 +208,9 @@ tags
 # Persistent undo
 [._]*.un~
 
+#.csv
+*.csv
+
+
 # End of https://www.toptal.com/developers/gitignore/api/python,linux,vim
 
