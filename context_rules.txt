@@ -1,0 +1,691 @@
+literal,direction,category
+does not demonstrate,backward,neg
+did not demonstrate,backward,neg
+do not demonstrate,backward,neg
+complications include,backward,hypo
+"complications include,",backward,hypo
+given some brief thought to,backward,poss
+never been high enough to cause,backward,poss
+options for,backward,hypo
+which demonstrates,terminate,hypo
+interested in,backward,poss
+etiology indeterminate,pseudo,poss
+patient and family,pseudo,exp
+patient and his husband,pseudo,exp
+patient and her husband,pseudo,exp
+patient and his wife,pseudo,exp
+patient and her wife,pseudo,exp
+patient and his family,pseudo,exp
+patient and her family,pseudo,exp
+patient and husband,pseudo,exp
+patient and wife,pseudo,exp
+family in the room,pseudo,exp
+does not suggest,backward,neg
+do not suggest,backward,neg
+did not suggest,backward,neg
+not suggest,pseudo,poss
+investigated for,backward,poss
+investigating for,backward,poss
+investigate for,backward,poss
+no overt,backward,poss
+likely due to,forward,poss
+resolution of,backward,neg
+no progression of the,pseudo,neg
+because,terminate,neg
+consideration given history,forward,hypo
+considered given history,forward,hypo
+consideration given history,backward,hist
+considered given history,backward,hist
+patient had,terminate,neg
+patient had,backward,hist
+was diagnosed,terminate,neg
+was diagnosed,backward,hist
+from,terminate,poss
+from,terminate,neg
+maybe,backward,poss
+no date,pseudo,neg
+no date:,pseudo,neg
+not limited,pseudo,neg
+didn't have,backward,neg
+don't have,backward,neg
+never used,backward,neg
+no question,pseudo,neg
+her2 negative,pseudo,neg
+who also had,pseudo,hypoexp
+symptomatology,forward,poss
+pmhx,backward,hist
+fmhx,backward,hist
+fmhx,backward,exp
+family history,backward,exp
+family history,backward,hist
+family member,backward,exp
+likely to pursue,pseudo,poss
+likely success,pseudo,poss
+likely failure,pseudo,poss
+cousin,backward,exp
+cousins,backward,exp
+trace,backward,poss
+prn,backward,hypo
+potential,backward,poss
+will be considered,forward,hypo
+would be considered,forward,hypo
+should be considered,forward,hypo
+considered,backward,hypo
+consider,backward,hypo
+consideration,backward,hypo
+should consider,backward,hypo
+should have,backward,hypo
+should be offered,backward,hypo
+scheduled,backward,hypo
+planned,backward,hypo
+plans for,backward,hypo
+plan for,backward,hypo
+plans are,backward,hypo
+candidate for,backward,hypo
+not a candidate for,backward,neg
+not be a candidate for,backward,neg
+put off,backward,hypo
+vs,backward,hypo
+discuss,backward,hypo
+discussed,backward,hypo
+discussion,backward,hypo
+versus,backward,hypo
+referred,backward,hypo
+advised,backward,hypo
+chance,backward,hypo
+risky,forward,poss
+recommended,forward,poss
+if experiences worsening,backward,hypo
+does not have,backward,neg
+doesn't have,backward,neg
+doesn't appear to have,backward,neg
+does not appear to have,backward,neg
+excluding,backward,neg
+ruled out,backward,neg
+differential diagnosis,backward,poss
+would not want to have,backward,neg
+decline,backward,neg
+declined,backward,neg
+appear,backward,poss
+appears,backward,poss
+suspect,backward,poss
+suspects,backward,poss
+to evaluate,backward,hypo
+indeterminate,forward,poss
+indeterminable,backward,poss
+to prevent,backward,hypo
+has been instructed,backward,hypo
+has been instructed in the sign,backward,hypo
+has been instructed in the signs,backward,hypo
+should the patient develop,backward,hypo
+none current,forward,neg
+no current,forward,neg
+hx,backward,hist
+previous,backward,hist
+previously,backward,hist
+previously undergone,backward,hist
+after undergoing,backward,hist
+deny,backward,neg
+no:,backward,neg
+no :,backward,neg
+(no,backward,neg
+--no,backward,neg
+don't sound like,backward,neg
+doesn't sound like,backward,neg
+denies any of the following symptoms:,backward,neg
+"denies, however,",backward,neg
+denies any associated,backward,neg
+denies any significant,backward,neg
+precaution for,backward,poss
+resection of,backward,hist
+debridement of,backward,hist
+indication for,backward,hist
+admitted for,backward,hist
+likely,backward,poss
+did deny,backward,neg
+no source of,backward,poss
+no source for,backward,poss
+did not show much of,backward,poss
+did not show much for,backward,poss
+no definite finding for,backward,poss
+no definite finding of,backward,poss
+no definite findings for,backward,poss
+no definite findings of,backward,poss
+concern about,backward,poss
+concerned about,backward,poss
+would,backward,poss
+could have,backward,poss
+may have,backward,poss
+raise the question of,backward,poss
+raise the question for,backward,poss
+raises the question of,backward,poss
+raises the question for,backward,poss
+highly unlikely,backward,poss
+did not show any,backward,neg
+do not show any,backward,neg
+does not show any,backward,neg
+suspicious for,backward,poss
+suspicion for,backward,poss
+suspicious of,backward,poss
+suspicion of,backward,poss
+a question of,backward,poss
+a question for,backward,poss
+without evidence of,backward,neg
+without evidence for,backward,neg
+without sign of,backward,neg
+without sign for,backward,neg
+without signs of,backward,neg
+without signs for,backward,neg
+did not demonstrate,backward,neg
+suggests,backward,poss
+suggest,backward,poss
+neg of,backward,neg
+neg for,backward,neg
+whether,backward,hypo
+sound more like,backward,poss
+sound like,backward,poss
+sounds more like,backward,poss
+sounds like,backward,poss
+look more like,backward,poss
+look like,backward,poss
+looks more like,backward,poss
+looks like,backward,poss
+review the use,backward,poss
+reviewed,backward,poss
+likely,forward,poss
+will have,backward,hypo
+may be,backward,poss
+for excluding,backward,poss
+potentially represent,backward,poss
+possibility of,backward,poss
+possibility for,backward,poss
+should symptoms suggesting,backward,poss
+look for,backward,hypo
+no evidence of,backward,neg
+no evidences of,backward,neg
+no evidence for,backward,neg
+no evidences for,backward,neg
+no sign of,backward,neg
+no sign for,backward,neg
+no signs of,backward,neg
+no signs for,backward,neg
+high-risk that she is at for,backward,hypo
+high-risk that she is at for,backward,hypo
+high risk that she is at for,backward,hypo
+high risk that she is at for,backward,hypo
+high-risk that the patient is at for,backward,hypo
+high-risk that the patient is at for,backward,hypo
+high risk that the patient is at for,backward,hypo
+high risk that the patient is at for,backward,hypo
+high-risk that he is at for,backward,hypo
+high-risk that he is at for,backward,hypo
+high risk that he is at for,backward,hypo
+high risk that he is at for,backward,hypo
+risk of,backward,hypo
+risk for,backward,hypo
+risks of,backward,hypo
+risks for,backward,hypo
+cardiovascular risk,pseudo,hypo
+cardiovascular risks,pseudo,hypo
+risk,backward,hypo
+risks,backward,hypo
+s/p,backward,hist
+at high-risk of,backward,hypo
+at high-risk for,backward,hypo
+at high risk of,backward,hypo
+at high risk for,backward,hypo
+at risk of,backward,hypo
+at-risk for,backward,hypo
+at risk of,backward,hypo
+at-risk for,backward,hypo
+re-assess,backward,hypo
+reassess,backward,hypo
+assess,backward,hypo
+prior,backward,hist
+pmh of,backward,hist
+pmh for,backward,hist
+concern,backward,poss
+concerning,backward,poss
+is concerned,forward,poss
+is concerned of,backward,poss
+is concerned for,backward,poss
+a concern of,backward,poss
+a concern for,backward,poss
+is possible,forward,poss
+is probable,forward,poss
+is potentional,forward,poss
+no overt clinical sign of,backward,neg
+no overt clinical sign for,backward,neg
+no overt clinical signs of,backward,neg
+no overt clinical signs for,backward,neg
+monitor of,backward,hypo
+monitor for,backward,hypo
+no source of,backward,neg
+no source for,backward,neg
+was ruled out of,backward,neg
+is ruled out of,backward,neg
+was ruled out for,backward,neg
+is ruled out for,backward,neg
+no evidence of,backward,neg
+no evidence for,backward,neg
+was negative of,backward,neg
+was negative for,backward,neg
+is negative of,backward,neg
+is negative for,backward,neg
+probable,backward,poss
+possible,backward,poss
+potential,backward,poss
+probable for,backward,poss
+probable of,backward,poss
+possible of,backward,poss
+possible for,backward,poss
+potential of,backward,poss
+potential for,backward,poss
+negative,backward,neg
+is possible,forward,poss
+is probable,forward,poss
+is negative,forward,neg
+was possible,forward,poss
+was probable,forward,poss
+was negative,forward,neg
+absence of,backward,neg
+absence for,backward,neg
+adequate to rule her out,backward,neg
+adequate to rule him out,backward,neg
+adequate to rule out,backward,neg
+adequate to rule the patient out,backward,neg
+although,terminate,neg
+any other,backward,neg
+apart from,terminate,neg
+are ruled out,forward,neg
+as a cause of,terminate,neg
+as a cause for,terminate,neg
+as a etiology for,terminate,neg
+as a etiology of,terminate,neg
+as a reason for,terminate,neg
+as a reason of,terminate,neg
+as a secondary cause for,terminate,neg
+as a secondary cause of,terminate,neg
+as a secondary etiology for,terminate,neg
+as a secondary etiology of,terminate,neg
+as a secondary origin for,terminate,neg
+as a secondary origin of,terminate,neg
+as a secondary reason for,terminate,neg
+as a secondary reason of,terminate,neg
+as a secondary source for,terminate,neg
+as a secondary source of,terminate,neg
+as a source for,terminate,neg
+as a source of,terminate,neg
+as a cause for,terminate,neg
+as a cause of,terminate,neg
+as an etiology for,terminate,neg
+as an etiology of,terminate,neg
+as an origin for,terminate,neg
+as an origin of,terminate,neg
+as a reason for,terminate,neg
+as a reason of,terminate,neg
+as a secondary cause for,terminate,neg
+as a secondary cause of,terminate,neg
+as a secondary etiology for,terminate,neg
+as a secondary etiology of,terminate,neg
+as a secondary origin for,terminate,neg
+as a secondary origin of,terminate,neg
+as a secondary reason for,terminate,neg
+as a secondary reason of,terminate,neg
+as a secondary source for,terminate,neg
+as a secondary source of,terminate,neg
+as a source for,terminate,neg
+as a source of,terminate,neg
+as has,terminate,neg
+as needed,backward,hypo
+as the cause for,terminate,neg
+as the cause of,terminate,neg
+as the etiology for,terminate,neg
+as the etiology of,terminate,neg
+as the origin for,terminate,neg
+as the origin of,terminate,neg
+as the reason for,terminate,neg
+as the reason of,terminate,neg
+as the secondary cause for,terminate,neg
+as the secondary cause of,terminate,neg
+as the secondary etiology for,terminate,neg
+as the secondary etiology of,terminate,neg
+as the secondary origin for,terminate,neg
+as the secondary origin of,terminate,neg
+as the secondary reason for,terminate,neg
+as the secondary reason of,terminate,neg
+as the secondary source for,terminate,neg
+as the secondary source of,terminate,neg
+as the source for,terminate,neg
+as the source of,terminate,neg
+as well as any,backward,neg
+aside from,terminate,neg
+aunt,backward,exp
+aunt:,backward,exp
+aunts,backward,exp
+aunt's,backward,exp
+be ruled out,forward,poss
+be ruled out for,backward,poss
+because,terminate,hypo
+being ruled out,forward,poss
+brother,backward,exp
+brother:,backward,exp
+brother's,backward,exp
+brothers,backward,exp
+but,terminate,neg
+can be ruled out,forward,neg
+can be ruled out for,backward,neg
+can rule her out,backward,neg
+can rule her out against,backward,neg
+can rule her out for,backward,neg
+can rule him out,backward,neg
+can rule him out against,backward,neg
+can rule him out for,backward,neg
+can rule out,backward,neg
+can rule out against,backward,neg
+can rule out for,backward,neg
+can rule the patient out,backward,neg
+can rule the patinet out against,backward,neg
+can rule the patinet out for,backward,neg
+cannot,backward,neg
+cannot exclude,backward,poss
+cause for,terminate,neg
+cause of,terminate,neg
+causes for,terminate,neg
+causes of,terminate,neg
+checked for,backward,neg
+clear of,backward,neg
+come back for,backward,hypo
+come back to,backward,hypo
+complains,terminate,histexp
+could be ruled out,forward,poss
+could be ruled out for,backward,poss
+currently,terminate,histexp
+dad,backward,exp
+dad:,backward,exp
+dad's,backward,exp
+declined,backward,neg
+declines,backward,neg
+denied,backward,neg
+denies,backward,neg
+denying,backward,neg
+did not rule out,forward,poss
+did rule her out,backward,neg
+did rule her out against,backward,neg
+did rule her out for,backward,neg
+did rule him out,backward,neg
+did rule him out against,backward,neg
+did rule him out for,backward,neg
+did rule out,backward,neg
+did rule out against,backward,neg
+did rule out for,backward,neg
+did rule the patient out,backward,neg
+did rule the patient out against,backward,neg
+did rule the patient out for,backward,neg
+doesn't look like,backward,neg
+ed,terminate,hist
+emergency department,terminate,hist
+etiology for,terminate,neg
+etiology of,terminate,neg
+evaluate for,backward,hypo
+evaluation for,backward,hypo
+except,terminate,neg
+fails to reveal,backward,neg
+family,backward,exp
+fam hx,backward,exp
+fam hx:,backward,exp
+father,backward,exp
+father:,backward,exp
+father's,backward,exp
+free,forward,neg
+free of,backward,neg
+gram negative,pseudo,neg
+grandfather,backward,exp
+grandfather's,backward,exp
+grandfather:,backward,exp
+grandmother,backward,exp
+grandmother's,backward,exp
+grandmother:,backward,exp
+has been negative,forward,neg
+has been ruled out,forward,neg
+have been ruled out,forward,neg
+her,terminate,hypoexp
+his,terminate,hypoexp
+hx of,backward,hist
+h/o,backward,hist
+statuspost,backward,hist
+status/post,backward,hist
+status-post,backward,hist
+status post,backward,hist
+year ago,backward,hist
+year ago,forward,hist
+years ago,backward,hist
+years ago,forward,hist
+have had,backward,hist
+has had,backward,hist
+had,backward,hist
+underwent,backward,hist
+husband,backward,exp
+ho,backward,hist
+history,backward,hist
+history of,backward,hist
+history and,pseudo,hist
+history and examination,pseudo,hist
+history and physical,pseudo,hist
+history for,pseudo,hist
+history of chief complaint,pseudo,hist
+history of present illness,pseudo,hist
+history taking,pseudo,hist
+"history, physical",pseudo,hist
+however,terminate,neg
+if,backward,hypo
+if negative,pseudo,hypo
+inconsistent with,backward,neg
+is not,backward,neg
+is ruled out,forward,neg
+is to be ruled out,forward,poss
+is to be ruled out for,backward,poss
+isn't,backward,neg
+lack of,backward,neg
+lacked,backward,neg
+may be ruled out,forward,poss
+may be ruled out for,backward,poss
+discussed,backward,poss
+might be ruled out,forward,poss
+might be ruled out for,backward,poss
+mom,backward,exp
+mom:,backward,exp
+mom's,backward,exp
+mother,backward,exp
+mother:,backward,exp
+mother's,backward,exp
+must be ruled out,forward,poss
+must be ruled out for,backward,poss
+negative for,backward,neg
+never developed,backward,neg
+never had,backward,neg
+nevertheless,terminate,neg
+no,backward,neg
+no abnormal,backward,neg
+no cause of,backward,neg
+no change,pseudo,neg
+no complaints of,backward,neg
+no definite change,pseudo,neg
+no evidence,backward,neg
+no evidence to suggest,backward,neg
+no findings of,backward,neg
+no findings to indicate,backward,neg
+no history of,backward,neg
+no increase,pseudo,neg
+no interval change,pseudo,neg
+no longer present,forward,neg
+no mammographic evidence of,backward,neg
+no new,backward,neg
+no new evidence,backward,neg
+no other evidence,backward,neg
+no radiographic evidence of,backward,neg
+no sign of,backward,neg
+no significant,backward,neg
+no significant change,pseudo,neg
+no significant interval change,pseudo,neg
+no signs of,backward,neg
+no suggestion of,backward,neg
+no suspicious,backward,neg
+no suspicious change,pseudo,neg
+non diagnostic,forward,neg
+not,backward,neg
+not appear,backward,neg
+not appreciate,backward,neg
+not associated with,backward,neg
+not been ruled out,forward,poss
+not cause,pseudo,neg
+not certain if,pseudo,neg
+not certain whether,pseudo,neg
+not complain of,backward,neg
+not demonstrate,backward,neg
+not drain,pseudo,neg
+not exhibit,backward,neg
+not extend,pseudo,neg
+not feel,backward,neg
+not had,backward,neg
+not have,backward,neg
+not have evidence of,backward,neg
+not know of,backward,neg
+not known to have,backward,neg
+not necessarily,pseudo,neg
+not on,pseudo,neg
+not only,pseudo,neg
+not recommended,forward,neg
+not recommend,backward,neg
+not recommending,backward,neg
+not reveal,backward,neg
+not ruled out,forward,poss
+not see,backward,neg
+not to be,backward,neg
+nothing to suggest,backward,neg
+noted,terminate,histexp
+now resolved,forward,neg
+origin for,terminate,neg
+origin of,terminate,neg
+origins for,terminate,neg
+origins of,terminate,neg
+other possibilities of,terminate,neg
+ought to be ruled out,forward,poss
+ought to be ruled out for,backward,poss
+past history,backward,hist
+past,backward,hist
+following up,backward,hist
+following,backward,hist
+received,backward,hist
+past medical history,backward,hist
+patient,terminate,hypoexp
+patient was not,backward,neg
+patient's,terminate,hypoexp
+poor history,pseudo,hist
+presenting,terminate,histexp
+presents,terminate,histexp
+prophylaxis,forward,neg
+r/o,backward,neg
+rather than,backward,neg
+reason for,terminate,neg
+reason of,terminate,neg
+reasons for,terminate,neg
+reasons of,terminate,neg
+reported,terminate,histexp
+reports,terminate,histexp
+resolved,backward,neg
+resolved after,forward,neg
+return,backward,hypo
+ro,backward,neg
+rule her out,backward,neg
+rule her out for,backward,neg
+rule him out,backward,neg
+rule him out for,backward,neg
+rule out,backward,neg
+rule out for,backward,neg
+rule the patient out,backward,neg
+rule the patinet out for,backward,neg
+ruled her out,backward,neg
+ruled her out against,backward,neg
+ruled her out for,backward,neg
+ruled him out,backward,neg
+ruled him out against,backward,neg
+ruled him out for,backward,neg
+ruled out,backward,neg
+ruled out against,backward,neg
+ruled out for,backward,neg
+ruled the patient out,backward,neg
+ruled the patient out against,backward,neg
+ruled the patient out for,backward,neg
+rules her out,backward,neg
+rules her out for,backward,neg
+rules him out,backward,neg
+rules him out for,backward,neg
+rules out,backward,neg
+rules out for,backward,neg
+rules the patient out,backward,neg
+rules the patient out for,backward,neg
+secondary,terminate,neg
+secondary to,terminate,neg
+should be ruled out,forward,neg
+should be ruled out for,backward,neg
+should he,backward,hypo
+should she,backward,hypo
+should the patient,backward,hypo
+should there,backward,hypo
+since,terminate,hypo
+sister,backward,exp
+sister's,backward,exp
+social history,pseudo,hist
+son,backward,exp
+source for,terminate,neg
+source of,terminate,neg
+sources for,terminate,neg
+sources of,terminate,neg
+states,terminate,histexp
+still,terminate,neg
+sudden onset of,pseudo,hist
+sufficient to rule her out,backward,neg
+sufficient to rule her out against,backward,neg
+sufficient to rule her out for,backward,neg
+sufficient to rule him out,backward,neg
+sufficient to rule him out against,backward,neg
+sufficient to rule him out for,backward,neg
+sufficient to rule out,backward,neg
+sufficient to rule out against,backward,neg
+sufficient to rule out for,backward,neg
+sufficient to rule the patient out,backward,neg
+sufficient to rule the patient out against,backward,neg
+sufficient to rule the patient out for,backward,neg
+test for,backward,neg
+though,terminate,neg
+to exclude,backward,neg
+today,terminate,histexp
+trigger event for,terminate,neg
+uncle,backward,exp
+uncle:,backward,exp
+uncle's,backward,exp
+unlikely,forward,neg
+unremarkable for,backward,neg
+was found,terminate,histexp
+was negative,forward,neg
+was not,backward,neg
+was ruled out,forward,neg
+wasn't,backward,neg
+what must be ruled out is,backward,poss
+which,terminate,exp
+wife,backward,exp
+who,terminate,hypoexp
+will be ruled out,forward,poss
+will be ruled out for,backward,poss
+with no,backward,neg
+without,backward,neg
+without any evidence of,backward,neg
+without difficulty,pseudo,neg
+without evidence,backward,neg
+without indication of,backward,neg
+without sign of,backward,neg
+yet,terminate,neg
+returned negative,forward,neg
+sometimes,pseudo,hypo
+eval,backward,hypo
