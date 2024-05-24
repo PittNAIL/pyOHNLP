@@ -13,10 +13,9 @@ def parse_args() -> argparse.Namespace:
                         required=True)
     parser.add_argument("--context_file", type=str, help="path to context rules", required=False,
                         default = None)
-#    parser.add_argument("--data_source", type=str, help="Note source", required=True, choices =
-#                        ['filesystem', 'database'])
-
-    parser.add_argument("--input_files", type=str, help="Note source", required=True, default = None)
+    parser.add_argument("--db_conf", type=str, help="path to database config .json file",
+                        required=False, default = None)
+    parser.add_argument("--file_path", type=str, help="Path to input .csv, .zip, or folder", required=False, default = None)
 
     return parser.parse_args()
 

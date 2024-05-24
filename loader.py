@@ -5,6 +5,7 @@ import medspacy
 import tqdm
 
 import util
+from data_read import collect_data
 
 CONTEXT_ATTRS = {
 'NEG': {'is_negated': True},
@@ -15,9 +16,6 @@ CONTEXT_ATTRS = {
 'HISTEXP': {'hist_experienced': True},
 'HYPOEXP': {'hypo_experienced': True}
 }
-
-data_to_collate = {
-'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
 
 def main():
     args = util.parse_args()
@@ -34,29 +32,7 @@ def main():
     for file in rule_files:
         target_matcher.add(util.compile_target_rules(file))
 
-    file_source = 'note_93.txt'
-    if os.path.isdir(args.input_files):
-        for file in tqdm.tqdm(os.listdir(args.input_files)):
-            with open(os.path.join(args.input_files, file), 'r') as f:
-                txt = f.read()
-
-            doc = nlp(txt)
-    #with open(f'/home/jordan/Downloads/rows/{file_source}', 'r') as f:
-    #    txt = f.read()
-
-   # doc = nlp(txt)
-
-            for ent in doc.ents:
-                data_to_collate['ent'].append(ent),
-                data_to_collate['negated'].append(ent._.is_negated),
-                data_to_collate['possible'].append(ent._.is_possible),
-                data_to_collate['hypothetical'].append(ent._.is_hypothetical),
-                data_to_collate['historical'].append(ent._.is_historical),
-                data_to_collate['is exp'].append(ent._.is_experiencer),
-                data_to_collate['hist exp'].append(ent._.hist_experienced),
-                data_to_collate['hypo exp'].append(ent._.hypo_experienced),
-                data_to_collate['source'].append(file),
-                data_to_collate['rule'].append(ent._.literal)
+    data_to_collate = collect_data(nlp)
 
     df = pd.DataFrame.from_dict(data_to_collate)
     df.to_csv('medspacy_results_sample.csv', index=False)

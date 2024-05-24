@@ -210,7 +210,8 @@ tags
 
 #.csv
 *.csv
-
+#.json
+*.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,linux,vim
 
