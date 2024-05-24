@@ -1,7 +1,7 @@
 import pandas as pd
 import tqdm
 import argparse
-from medspacy.context import ConText, ConTextRule
+from medspacy.context import ConTextRule
 from medspacy.ner import TargetRule
 
 def parse_args() -> argparse.Namespace:
@@ -12,7 +12,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ruleset_dir", type=str, help="path to target match rules",
                         required=True)
     parser.add_argument("--context_file", type=str, help="path to context rules", required=False,
-                        default = None)
+                        default = "context_rules.txt")
     parser.add_argument("--db_conf", type=str, help="path to database config .json file",
                         required=False, default = None)
     parser.add_argument("--file_path", type=str, help="Path to input .csv, .zip, or folder", required=False, default = None)

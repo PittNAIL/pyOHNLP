@@ -1,8 +1,6 @@
 import pandas as pd
 import os
-from medspacy.context import ConTextRule, ConText
 import medspacy
-import tqdm
 
 import util
 from data_read import collect_data

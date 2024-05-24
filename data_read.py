@@ -1,4 +1,3 @@
-import pandas as pd
 import json
 import tqdm
 import os
@@ -44,32 +43,33 @@ def collect_data(nlp):
         if os.path.isfile(args.file_path):
             raise ValueError(".zip and .csv compatibility not yet implemented.")
 
-    if os.path.isfile(args.db_conf):
-        if not (args.db_conf).endswith('.json'):
-            raise ValueError("Database Config file must be .json!")
+    if (args.db_conf != None):
+        if os.path.isfile(args.db_conf):
+            if not (args.db_conf).endswith('.json'):
+                raise ValueError("Database Config file must be .json!")
 
-        if (args.db_conf).endswith('json'):
-            with open(args.db_conf, 'r') as f:
-                conn_details = json.load(f)['config']
+            if (args.db_conf).endswith('json'):
+                with open(args.db_conf, 'r') as f:
+                    conn_details = json.load(f)['config']
 
-            if conn_details['db_type'] == 'postgresql':
-                db, user, host = conn_details['database'], conn_details['user'], conn_details['host'],
-                password = conn_details['password']
-                connect = psycopg2.connect(database = db, user = user, host = host, password =
-                                           password)
-                cursor = connect.cursor()
-                table = conn_details['input_table']
-                text_col = conn_details['text_col']
-                ident = conn_details['id_col']
-                cursor.execute(f"select {text_col}, {ident} from {table} limit 10")
-                records = cursor.fetchall()
-                for record in records:
-                    doc = nlp(record[0])
-                    source = record[1]
-                    for ent in doc.ents:
-                        append_ent_data(ent, source)
-                cursor.close()
-                connect.close()
+                if conn_details['db_type'] == 'postgresql':
+                    db, user, host = conn_details['database'], conn_details['user'], conn_details['host'],
+                    password = conn_details['password']
+                    connect = psycopg2.connect(database = db, user = user, host = host, password =
+                                               password)
+                    cursor = connect.cursor()
+                    table = conn_details['input_table']
+                    text_col = conn_details['text_col']
+                    ident = conn_details['id_col']
+                    cursor.execute(f"select {text_col}, {ident} from {table} limit 10")
+                    records = cursor.fetchall()
+                    for record in records:
+                        doc = nlp(record[0])
+                        source = record[1]
+                        for ent in doc.ents:
+                            append_ent_data(ent, source)
+                    cursor.close()
+                    connect.close()
 
     return data_to_collate
 
