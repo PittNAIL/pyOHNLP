@@ -26,8 +26,8 @@ provided below:
 Execution of the pipeline with your database can be achieved with the command
 ```python
 python loader.py --ruleset_dir <PATH TO RULESET> --context_file <PATH TO CONTEXT FILE> --db_conf
-<PATH TO DB CONFIG> 
-
+<PATH TO DB CONFIG>
+```
 ## Implementation
 MediTag has been implemented by [Jordan Hilsman][jordan] from [PittNail][pn] at the [University of Pittsburgh][pitt].
 
