@@ -68,6 +68,8 @@ def collect_data(nlp):
                     source = record[1]
                     for ent in doc.ents:
                         append_ent_data(ent, source)
+                cursor.close()
+                connect.close()
 
     return data_to_collate
 
