@@ -2,14 +2,20 @@ import json
 import tqdm
 import os
 import psycopg2
+import tqdm
+import multiprocessing
+
+from functools import partial
 
 from util import parse_args
 
 args = parse_args()
-batch_size = 10
+batch_size = 1000
 
 data_to_collate = {
 'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
+
+num_processes = multiprocessing.cpu_count()
 
 def append_ent_data(ent, source):
     data_to_collate['ent'].append(ent),
@@ -23,7 +29,15 @@ def append_ent_data(ent, source):
     data_to_collate['source'].append(source),
     data_to_collate['rule'].append(ent._.literal)
 
+def process_text(text, nlp, source):
+    doc = nlp(text)
+    for ent in doc.ents:
+        append_ent_data(ent, source)
 
+
+def process_records(args):
+    text, source, nlp = args
+    process_text(text, nlp, source)
 
 def collect_data(nlp):
 
@@ -35,10 +49,7 @@ def collect_data(nlp):
             for file in tqdm.tqdm(os.listdir(args.file_path)):
                 with open(os.path.join(args.file_path, file), 'r') as f:
                    txt = f.read()
-                doc = nlp(txt)
-
-                for ent in doc.ents:
-                    append_ent_data(ent, file)
+                process_text(txt, nlp, file)
 
         if os.path.isfile(args.file_path):
             raise ValueError(".zip and .csv compatibility not yet implemented.")
@@ -61,13 +72,17 @@ def collect_data(nlp):
                     table = conn_details['input_table']
                     text_col = conn_details['text_col']
                     ident = conn_details['id_col']
-                    cursor.execute(f"select {text_col}, {ident} from {table} limit 10")
-                    records = cursor.fetchall()
-                    for record in records:
-                        doc = nlp(record[0])
-                        source = record[1]
-                        for ent in doc.ents:
-                            append_ent_data(ent, source)
+                    cursor.execute(f"select {text_col}, {ident} from {table} ")
+
+
+                    with multiprocessing.Pool(num_processes) as pool:
+                        while True:
+                            records = cursor.fetchmany(batch_size)
+                            if not records:
+                                break
+                            pool.map(process_records, [(record[0], record[1], nlp) for record in records])
+
+
                     cursor.close()
                     connect.close()
 
