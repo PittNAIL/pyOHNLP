@@ -12,34 +12,43 @@ from util import parse_args
 args = parse_args()
 batch_size = 1000
 
-data_to_collate = {
-'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
+data_to_collate = {'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
+
 
 num_processes = multiprocessing.cpu_count()
 
 def append_ent_data(ent, source):
-    data_to_collate['ent'].append(ent),
-    data_to_collate['negated'].append(ent._.is_negated),
-    data_to_collate['possible'].append(ent._.is_possible),
-    data_to_collate['hypothetical'].append(ent._.is_hypothetical),
-    data_to_collate['historical'].append(ent._.is_historical),
-    data_to_collate['is exp'].append(ent._.is_experiencer),
-    data_to_collate['hist exp'].append(ent._.hist_experienced),
-    data_to_collate['hypo exp'].append(ent._.hypo_experienced),
-    data_to_collate['source'].append(source),
-    data_to_collate['rule'].append(ent._.literal)
+    return {
+        'ent': str(ent),
+        'negated': ent._.is_negated,
+        'possible': ent._.is_possible,
+        'hypothetical': ent._.is_hypothetical,
+        'historical': ent._.is_historical,
+        'is exp': ent._.is_experiencer,
+        'hist exp': ent._.hist_experienced,
+        'hypo exp': ent._.hypo_experienced,
+        'source': source,
+        'rule': str(ent._.literal)
+    }
 
 def process_text(text, nlp, source):
     doc = nlp(text)
+    results = []
     for ent in doc.ents:
-        append_ent_data(ent, source)
-
+        results.append(append_ent_data(ent, source))
+    return results
 
 def process_records(args):
-    text, source, nlp = args
-    process_text(text, nlp, source)
+    text, source, nlp, shared_dtc = args
+    results = process_text(text, nlp, source)
+    for result in results:
+        for key in data_to_collate:
+            shared_dtc[key].append(result[key])
 
 def collect_data(nlp):
+
+
+    data_to_collate = {'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
 
     if (args.db_conf == None) & (args.file_path == None):
         raise ValueError("No input to process! --file_path or --db_conf argument needed!")
@@ -74,17 +83,19 @@ def collect_data(nlp):
                     ident = conn_details['id_col']
                     cursor.execute(f"select {text_col}, {ident} from {table} ")
 
+                    manager = multiprocessing.Manager()
+                    shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
 
                     with multiprocessing.Pool(num_processes) as pool:
                         while True:
                             records = cursor.fetchmany(batch_size)
                             if not records:
                                 break
-                            pool.map(process_records, [(record[0], record[1], nlp) for record in records])
-
+                            pool.map(process_records, [(record[0], record[1], nlp, shared_dtc) for
+                                                                 record in records])
 
                     cursor.close()
                     connect.close()
-
-    return data_to_collate
+                    data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
+    return data_to_collate 
 
