@@ -48,7 +48,6 @@ def set_extensions(CONTEXT_ATTRS):
     Span.set_extension("is_template", default=False, force=True)
     Span.set_extension("is_classifier", default=False, force=True)
     Span.set_extension("literal", getter=get_literal, force=True)
-    Span.set_extension("is_asserted", getter= lambda x: is_asserted(x), force=True)
     Span.set_extension("is_possible", default=False, force=True)
 
 def get_literal(span):

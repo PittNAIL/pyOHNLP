@@ -2,10 +2,7 @@ import json
 import tqdm
 import os
 import psycopg2
-import tqdm
 import multiprocessing
-
-from functools import partial
 
 from util import parse_args
 
@@ -16,6 +13,18 @@ data_to_collate = {'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [
 
 
 num_processes = multiprocessing.cpu_count()
+
+def append_dtc(ent, source, dtc):
+    dtc['ent'].append(str(ent))
+    dtc['negated'].append(ent._.is_negated)
+    dtc['possible'].append(ent._.is_possible)
+    dtc['hypothetical'].append(ent._.is_hypothetical)
+    dtc['historical'].append(ent._.is_historical)
+    dtc['is exp'].append(ent._.is_experiencer)
+    dtc['hist exp'].append(ent._.hist_experienced)
+    dtc['hypo exp'].append(ent._.hypo_experienced)
+    dtc['source'].append(source)
+    dtc['rule'].append(str(ent._.literal))
 
 def append_ent_data(ent, source):
     return {
@@ -50,20 +59,22 @@ def collect_data(nlp):
 
     data_to_collate = {'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
 
-    if (args.db_conf == None) & (args.file_path == None):
+    if (args.db_conf is None) & (args.file_path is None):
         raise ValueError("No input to process! --file_path or --db_conf argument needed!")
 
-    if (args.file_path != None):
+    if (args.file_path is not None):
         if os.path.isdir(args.file_path):
             for file in tqdm.tqdm(os.listdir(args.file_path)):
                 with open(os.path.join(args.file_path, file), 'r') as f:
                    txt = f.read()
-                process_text(txt, nlp, file)
+                doc = nlp(txt)
+                for ent in doc.ents:
+                    append_dtc(ent, file, data_to_collate)
 
         if os.path.isfile(args.file_path):
             raise ValueError(".zip and .csv compatibility not yet implemented.")
 
-    if (args.db_conf != None):
+    if (args.db_conf is not None):
         if os.path.isfile(args.db_conf):
             if not (args.db_conf).endswith('.json'):
                 raise ValueError("Database Config file must be .json!")
@@ -81,7 +92,7 @@ def collect_data(nlp):
                     table = conn_details['input_table']
                     text_col = conn_details['text_col']
                     ident = conn_details['id_col']
-                    cursor.execute(f"select {text_col}, {ident} from {table} ")
+                    cursor.execute(f"select {text_col}, {ident} from {table}")
 
                     manager = multiprocessing.Manager()
                     shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
@@ -91,11 +102,13 @@ def collect_data(nlp):
                             records = cursor.fetchmany(batch_size)
                             if not records:
                                 break
-                            pool.map(process_records, [(record[0], record[1], nlp, shared_dtc) for
+                            pool.map(process_records, [(record[0], record[1], nlp,
+                                                        shared_dtc) for
                                                                  record in records])
 
                     cursor.close()
                     connect.close()
                     data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
-    return data_to_collate 
+
+    return data_to_collate
 
