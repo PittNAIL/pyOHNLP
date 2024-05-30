@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import json
 import medspacy
 
 import util
@@ -14,7 +15,6 @@ CONTEXT_ATTRS = {
     "HISTEXP": {"hist_experienced": True},
     "HYPOEXP": {"hypo_experienced": True},
 }
-
 
 def main():
     args = util.parse_args()
@@ -33,8 +33,17 @@ def main():
 
     data_to_collate = collect_data(nlp)
 
-    df = pd.DataFrame.from_dict(data_to_collate)
-    df.to_csv("medspacy_results_sample.csv", index=False)
+    if args.db_conf is None:
+        df = pd.DataFrame.from_dict(data_to_collate)
+        df.to_csv("medspacy_results_sample.csv", index=False)
+    else:
+        with open(args.db_conf, 'r') as f:
+            config = json.load(f)
+        if config['write_to']['to_csv'] == "True":
+            df = pd.DataFrame.from_dict(data_to_collate)
+            df.to_csv("medspacy_results_sample.csv", index=False)
+        else:
+            raise ValueError("I haven't implemented this yet!!")
 
 
 if __name__ == "__main__":
