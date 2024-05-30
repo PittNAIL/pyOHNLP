@@ -1,4 +1,5 @@
 import json
+import csv
 import tqdm
 import os
 import psycopg2
@@ -8,9 +9,6 @@ from util import parse_args
 
 args = parse_args()
 batch_size = 1000
-
-data_to_collate = {'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
-
 
 num_processes = multiprocessing.cpu_count()
 
@@ -50,29 +48,44 @@ def process_text(text, nlp, source):
 def process_records(args):
     text, source, nlp, shared_dtc = args
     results = process_text(text, nlp, source)
+    print(shared_dtc.keys())
     for result in results:
-        for key in data_to_collate:
+        for key in shared_dtc.keys():
             shared_dtc[key].append(result[key])
 
 def collect_data(nlp):
 
-
     data_to_collate = {'ent' : [], 'negated': [], 'possible' : [], 'hypothetical': [], 'historical': [], 'is exp': [], 'hist exp': [], 'hypo exp': [], 'source': [], 'rule': []}
+
+    manager = multiprocessing.Manager()
+    shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
 
     if (args.db_conf is None) & (args.file_path is None):
         raise ValueError("No input to process! --file_path or --db_conf argument needed!")
 
     if (args.file_path is not None):
         if os.path.isdir(args.file_path):
+            texts = []
             for file in tqdm.tqdm(os.listdir(args.file_path)):
                 with open(os.path.join(args.file_path, file), 'r') as f:
                    txt = f.read()
-                doc = nlp(txt)
-                for ent in doc.ents:
-                    append_dtc(ent, file, data_to_collate)
+                texts.append((txt, file, nlp, shared_dtc))
+            pool = multiprocessing.Pool(processes=num_processes)
+            pool.map(process_records, texts)
+            data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
         if os.path.isfile(args.file_path):
-            raise ValueError(".zip and .csv compatibility not yet implemented.")
+            if args.file_path.endswith('.csv'):
+                with open(args.file_path, 'r') as f:
+                    rows = list(csv.DictReader(f, delimiter = ',', quotechar='"'))
+                note_text = [row['note_text'] for row in rows]
+                args_list = [(text, args.file_path, nlp, shared_dtc) for text in note_text]
+                pool = multiprocessing.Pool(processes = num_processes)
+                pool.map(process_records, args_list)
+                data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
+
+            else:
+                raise ValueError(".zip compatibility not yet implemented.")
 
     if (args.db_conf is not None):
         if os.path.isfile(args.db_conf):
@@ -92,10 +105,8 @@ def collect_data(nlp):
                     table = conn_details['input_table']
                     text_col = conn_details['text_col']
                     ident = conn_details['id_col']
-                    cursor.execute(f"select {text_col}, {ident} from {table}")
+                    cursor.execute(f"select {text_col}, {ident} from {table} limit 1000")
 
-                    manager = multiprocessing.Manager()
-                    shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
 
                     with multiprocessing.Pool(num_processes) as pool:
                         while True:

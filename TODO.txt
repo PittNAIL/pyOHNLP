@@ -7,7 +7,6 @@ READ FROM DB WRITE TO .CSV
 READ FROM .CSV WRITE TO DATABASE
 READ FROM .ZIP WRITE TO DATABASE
 READ FROM .ZIP WRITE TO .CSV
-READ FROM .CSV WRITE TO .CSV
 READ FROM DB WRITE TO DB
 
 reading .zip should be done 'in stream' without extracting the .zip file into temporary folder if
