@@ -124,4 +124,9 @@ def collect_data(nlp):
                     connect.close()
                     data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
+                if conn_details["db_type"] != "postgresql":
+                    raise ValueError(f"Database support for {conn_details["db_type"]} not supported!
+                                     Please consider using postgresql if you'd like to read or write
+                                     to database")
+
     return data_to_collate
