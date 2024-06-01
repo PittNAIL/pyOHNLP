@@ -18,9 +18,9 @@ def append_ent_data(ent, source):
         "possible": ent._.is_possible,
         "hypothetical": ent._.is_hypothetical,
         "historical": ent._.is_historical,
-        "is exp": ent._.is_experiencer,
-        "hist exp": ent._.hist_experienced,
-        "hypo exp": ent._.hypo_experienced,
+        "is_exp": ent._.is_experiencer,
+        "hist_exp": ent._.hist_experienced,
+        "hypo_exp": ent._.hypo_experienced,
         "source": source,
         "rule": str(ent._.literal),
     }
@@ -47,9 +47,9 @@ def collect_data(nlp):
         "possible": [],
         "hypothetical": [],
         "historical": [],
-        "is exp": [],
-        "hist exp": [],
-        "hypo exp": [],
+        "is_exp": [],
+        "hist_exp": [],
+        "hypo_exp": [],
         "source": [],
         "rule": [],
     }
@@ -91,7 +91,7 @@ def collect_data(nlp):
 
             if (args.db_conf).endswith("json"):
                 with open(args.db_conf, "r") as f:
-                    conn_details = json.load(f)["config"]
+                    conn_details = json.load(f)["read_from"]
 
                 if conn_details["db_type"] == "postgresql":
                     db, user, host = (
@@ -105,7 +105,7 @@ def collect_data(nlp):
                     text_col = conn_details["text_col"]
                     ident = conn_details["id_col"]
                     cursor = connect.cursor()
-                    cursor.execute(f"select {text_col}, {ident} from {table}")
+                    cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
 
                     with multiprocessing.Pool(num_processes) as pool:
                         while True:

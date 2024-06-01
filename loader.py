@@ -3,6 +3,7 @@ import os
 import json
 import medspacy
 
+from dbwriter import write_to_db
 import util
 from data_read import collect_data
 
@@ -18,6 +19,8 @@ CONTEXT_ATTRS = {
 
 def main():
     args = util.parse_args()
+    with open(args.db_conf, 'r') as f:
+        conf = json.load(f)
     util.set_extensions(CONTEXT_ATTRS)
     nlp = medspacy.load()
     nlp.remove_pipe("medspacy_context")
@@ -25,7 +28,9 @@ def main():
     context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
     context.add(context_rules_list)
 
-    rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
+#    rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
+    rule_files = [os.path.join(conf['ruleset_dir'], file) for file in
+                  os.listdir(conf['ruleset_dir'])]
     target_matcher = nlp.get_pipe("medspacy_target_matcher")
 
     for file in rule_files:
@@ -33,17 +38,11 @@ def main():
 
     data_to_collate = collect_data(nlp)
 
-    if args.db_conf is None:
+    if conf['write_to']['to_csv'] == "True":
         df = pd.DataFrame.from_dict(data_to_collate)
         df.to_csv("medspacy_results_sample.csv", index=False)
-    else:
-        with open(args.db_conf, 'r') as f:
-            config = json.load(f)
-        if config['write_to']['to_csv'] == "True":
-            df = pd.DataFrame.from_dict(data_to_collate)
-            df.to_csv("medspacy_results_sample.csv", index=False)
-        else:
-            raise ValueError("I haven't implemented this yet!!")
+    if conf['write_to']['to_table'] is not None:
+        write_to_db(data_to_collate, args.db_conf)
 
 
 if __name__ == "__main__":

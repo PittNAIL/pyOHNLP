@@ -10,7 +10,6 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser("MedSpaCy annotation of Clinical Notes")
 
-    parser.add_argument("--ruleset_dir", type=str, help="path to target match rules", required=True)
     parser.add_argument(
         "--context_file",
         type=str,
