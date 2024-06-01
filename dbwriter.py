@@ -1,7 +1,7 @@
+import csv
 import json
 import psycopg2
 
-import csv
 from io import StringIO
 
 from util import parse_args
@@ -10,9 +10,6 @@ args = parse_args()
 
 with open(args.db_conf, "r") as f:
     config = json.load(f)
-
-print(config)
-
 
 def write_to_db(dtc, config):
     columns = list(dtc.keys())

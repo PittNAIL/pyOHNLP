@@ -1,9 +1,10 @@
-import pandas as pd
-import tqdm
 import argparse
+import tqdm
+
+import pandas as pd
+
 from medspacy.context import ConTextRule
 from medspacy.ner import TargetRule
-
 
 def parse_args() -> argparse.Namespace:
     """Parses the command line arguments."""

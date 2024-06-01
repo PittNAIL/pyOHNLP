@@ -1,11 +1,12 @@
-import pandas as pd
-import os
 import json
 import medspacy
-
-from dbwriter import write_to_db
+import os
 import util
+
+import pandas as pd
+
 from data_read import collect_data
+from dbwriter import write_to_db
 
 CONTEXT_ATTRS = {
     "NEG": {"is_negated": True},
