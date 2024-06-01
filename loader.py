@@ -17,9 +17,10 @@ CONTEXT_ATTRS = {
     "HYPOEXP": {"hypo_experienced": True},
 }
 
+
 def main():
     args = util.parse_args()
-    with open(args.db_conf, 'r') as f:
+    with open(args.db_conf, "r") as f:
         conf = json.load(f)
     util.set_extensions(CONTEXT_ATTRS)
     nlp = medspacy.load()
@@ -28,9 +29,10 @@ def main():
     context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
     context.add(context_rules_list)
 
-#    rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
-    rule_files = [os.path.join(conf['ruleset_dir'], file) for file in
-                  os.listdir(conf['ruleset_dir'])]
+    #    rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
+    rule_files = [
+        os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
+    ]
     target_matcher = nlp.get_pipe("medspacy_target_matcher")
 
     for file in rule_files:
@@ -38,10 +40,10 @@ def main():
 
     data_to_collate = collect_data(nlp)
 
-    if conf['write_to']['to_csv'] == "True":
+    if conf["write_to"]["to_csv"] == "True":
         df = pd.DataFrame.from_dict(data_to_collate)
         df.to_csv("medspacy_results_sample.csv", index=False)
-    if conf['write_to']['to_table'] is not None:
+    if conf["write_to"]["to_table"] is not None:
         write_to_db(data_to_collate, args.db_conf)
 
 

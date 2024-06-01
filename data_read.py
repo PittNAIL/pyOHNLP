@@ -11,6 +11,7 @@ batch_size = 1000
 
 num_processes = multiprocessing.cpu_count()
 
+
 def append_ent_data(ent, source):
     return {
         "ent": str(ent),
@@ -25,6 +26,7 @@ def append_ent_data(ent, source):
         "rule": str(ent._.literal),
     }
 
+
 def process_text(text, nlp, source):
     doc = nlp(text)
     results = []
@@ -32,12 +34,14 @@ def process_text(text, nlp, source):
         results.append(append_ent_data(ent, source))
     return results
 
+
 def process_records(args):
     text, source, nlp, shared_dtc = args
     results = process_text(text, nlp, source)
     for result in results:
         for key in shared_dtc.keys():
             shared_dtc[key].append(result[key])
+
 
 def collect_data(nlp):
 
