@@ -6,6 +6,7 @@ import pandas as pd
 from medspacy.context import ConTextRule
 from medspacy.ner import TargetRule
 
+
 def parse_args() -> argparse.Namespace:
     """Parses the command line arguments."""
 
@@ -71,6 +72,9 @@ def set_extensions(CONTEXT_ATTRS):
     Span.set_extension("is_classifier", default=False, force=True)
     Span.set_extension("literal", getter=get_literal, force=True)
     Span.set_extension("is_possible", default=False, force=True)
+    Span.set_extension("is_patient", default=True, force=True)
+    Span.set_extension("is_present", default=True, force=True)
+    Span.set_extension("is_positive", default=True, force=True)
 
 
 def get_literal(span):

@@ -13,18 +13,44 @@ num_processes = multiprocessing.cpu_count()
 
 
 def append_ent_data(ent, source):
+    if ent._.is_negated:
+        certainty = "Negated"
+    elif ent._.is_possible:
+        certainty = "Possible"
+    elif ent._.is_hypothetical:
+        certainty = "Hypothetical"
+    else:
+        certainty = "Positive"
+    if ent._.fam_experiencer:
+        experiencer = "Family"
+    else:
+        experiencer = "Patient"
+    if ent._.is_historical:
+        status = "History"
+    if (ent._.hypo_experienced | ent._.hist_experienced):
+        status = "Other History"
+    else:
+        status = "Present"
     return {
-        "ent": str(ent),
-        "negated": ent._.is_negated,
-        "possible": ent._.is_possible,
-        "hypothetical": ent._.is_hypothetical,
-        "historical": ent._.is_historical,
-        "is_exp": ent._.is_experiencer,
-        "hist_exp": ent._.hist_experienced,
-        "hypo_exp": ent._.hypo_experienced,
-        "source": source,
-        "rule": str(ent._.literal),
-    }
+            "ent" : str(ent),
+            "certainty": certainty,
+            "status": status,
+            "experiencer": experiencer,
+            "source": source,
+            "rule" : str(ent._.literal)
+            }
+#    return {
+#        "ent": str(ent),
+#        "negated": ent._.is_negated,
+#        "possible": ent._.is_possible,
+#        "hypothetical": ent._.is_hypothetical,
+#        "historical": ent._.is_historical,
+#        "is_exp": ent._.is_experiencer,
+#        "hist_exp": ent._.hist_experienced,
+#        "hypo_exp": ent._.hypo_experienced,
+#        "source": source,
+#        "rule": str(ent._.literal),
+#    }
 
 
 def process_text(text, nlp, source):
@@ -46,17 +72,28 @@ def process_records(args):
 def collect_data(nlp):
 
     data_to_collate = {
-        "ent": [],
-        "negated": [],
-        "possible": [],
-        "hypothetical": [],
-        "historical": [],
-        "is_exp": [],
-        "hist_exp": [],
-        "hypo_exp": [],
-        "source": [],
-        "rule": [],
-    }
+            "ent": [],
+            "certainty": [],
+            "status": [],
+            "experiencer": [],
+            "source": [],
+            "rule": []
+            }
+    #TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
+    # METADATA WILL NEED TO BE DEFINED IN HERE.
+
+#    data_to_collate = {
+#        "ent": [],
+#        "negated": [],
+#        "possible": [],
+#        "hypothetical": [],
+#        "historical": [],
+#        "is_exp": [],
+#        "hist_exp": [],
+#        "hypo_exp": [],
+#        "source": [],
+#        "rule": [],
+#    }
 
     manager = multiprocessing.Manager()
     shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
@@ -125,8 +162,6 @@ def collect_data(nlp):
                     data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
                 if conn_details["db_type"] != "postgresql":
-                    raise ValueError(f"Database support for {conn_details["db_type"]} not supported!
-                                     Please consider using postgresql if you'd like to read or write
-                                     to database")
+                    raise ValueError(f"Database not supported! Please consider using postgresql if you'd like to read or write to database")
 
     return data_to_collate

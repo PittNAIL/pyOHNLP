@@ -39,5 +39,4 @@ def write_to_db(dtc, config):
         cursor.close()
         connect.close()
     if config["db_type"] != "postgresql":
-        raise ValueError(f"Write capability for {config["db_type"]} not yet implemented. Only
-                         PostgreSQL compatibility enabled at this time.")
+        raise ValueError("Only postgresql supported at the moment.")

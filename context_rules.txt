@@ -10,16 +10,16 @@ options for,backward,hypo
 which demonstrates,terminate,hypo
 interested in,backward,poss
 etiology indeterminate,pseudo,poss
-patient and family,pseudo,exp
-patient and his husband,pseudo,exp
-patient and her husband,pseudo,exp
-patient and his wife,pseudo,exp
-patient and her wife,pseudo,exp
-patient and his family,pseudo,exp
-patient and her family,pseudo,exp
-patient and husband,pseudo,exp
-patient and wife,pseudo,exp
-family in the room,pseudo,exp
+patient and family,pseudo,exp_family
+patient and his husband,pseudo,exp_family
+patient and her husband,pseudo,exp_family
+patient and his wife,pseudo,exp_family
+patient and her wife,pseudo,exp_family
+patient and his family,pseudo,exp_family
+patient and her family,pseudo,exp_family
+patient and husband,pseudo,exp_family
+patient and wife,pseudo,exp_family
+family in the room,pseudo,exp_family
 does not suggest,backward,neg
 do not suggest,backward,neg
 did not suggest,backward,neg
@@ -55,15 +55,15 @@ who also had,pseudo,hypoexp
 symptomatology,forward,poss
 pmhx,backward,hist
 fmhx,backward,hist
-fmhx,backward,exp
-family history,backward,exp
+fmhx,backward,exp_family
+family history,backward,exp_family
 family history,backward,hist
-family member,backward,exp
+family member,backward,exp_family
 likely to pursue,pseudo,poss
 likely success,pseudo,poss
 likely failure,pseudo,poss
-cousin,backward,exp
-cousins,backward,exp
+cousin,backward,exp_family
+cousins,backward,exp_family
 trace,backward,poss
 prn,backward,hypo
 potential,backward,poss
@@ -360,18 +360,18 @@ as the source for,terminate,neg
 as the source of,terminate,neg
 as well as any,backward,neg
 aside from,terminate,neg
-aunt,backward,exp
-aunt:,backward,exp
-aunts,backward,exp
-aunt's,backward,exp
+aunt,backward,exp_family
+aunt:,backward,exp_family
+aunts,backward,exp_family
+aunt's,backward,exp_family
 be ruled out,forward,poss
 be ruled out for,backward,poss
 because,terminate,hypo
 being ruled out,forward,poss
-brother,backward,exp
-brother:,backward,exp
-brother's,backward,exp
-brothers,backward,exp
+brother,backward,exp_family
+brother:,backward,exp_family
+brother's,backward,exp_family
+brothers,backward,exp_family
 but,terminate,neg
 can be ruled out,forward,neg
 can be ruled out for,backward,neg
@@ -401,9 +401,9 @@ complains,terminate,histexp
 could be ruled out,forward,poss
 could be ruled out for,backward,poss
 currently,terminate,histexp
-dad,backward,exp
-dad:,backward,exp
-dad's,backward,exp
+dad,backward,exp_family
+dad:,backward,exp_family
+dad's,backward,exp_family
 declined,backward,neg
 declines,backward,neg
 denied,backward,neg
@@ -431,21 +431,21 @@ evaluate for,backward,hypo
 evaluation for,backward,hypo
 except,terminate,neg
 fails to reveal,backward,neg
-family,backward,exp
-fam hx,backward,exp
-fam hx:,backward,exp
-father,backward,exp
-father:,backward,exp
-father's,backward,exp
+family,backward,exp_family
+fam hx,backward,exp_family
+fam hx:,backward,exp_family
+father,backward,exp_family
+father:,backward,exp_family
+father's,backward,exp_family
 free,forward,neg
 free of,backward,neg
 gram negative,pseudo,neg
-grandfather,backward,exp
-grandfather's,backward,exp
-grandfather:,backward,exp
-grandmother,backward,exp
-grandmother's,backward,exp
-grandmother:,backward,exp
+grandfather,backward,exp_family
+grandfather's,backward,exp_family
+grandfather:,backward,exp_family
+grandmother,backward,exp_family
+grandmother's,backward,exp_family
+grandmother:,backward,exp_family
 has been negative,forward,neg
 has been ruled out,forward,neg
 have been ruled out,forward,neg
@@ -465,7 +465,7 @@ have had,backward,hist
 has had,backward,hist
 had,backward,hist
 underwent,backward,hist
-husband,backward,exp
+husband,backward,exp_family
 ho,backward,hist
 history,backward,hist
 history of,backward,hist
@@ -493,12 +493,12 @@ may be ruled out for,backward,poss
 discussed,backward,poss
 might be ruled out,forward,poss
 might be ruled out for,backward,poss
-mom,backward,exp
-mom:,backward,exp
-mom's,backward,exp
-mother,backward,exp
-mother:,backward,exp
-mother's,backward,exp
+mom,backward,exp_family
+mom:,backward,exp_family
+mom's,backward,exp_family
+mother,backward,exp_family
+mother:,backward,exp_family
+mother's,backward,exp_family
 must be ruled out,forward,poss
 must be ruled out for,backward,poss
 negative for,backward,neg
@@ -634,10 +634,10 @@ should she,backward,hypo
 should the patient,backward,hypo
 should there,backward,hypo
 since,terminate,hypo
-sister,backward,exp
-sister's,backward,exp
+sister,backward,exp_family
+sister's,backward,exp_family
 social history,pseudo,hist
-son,backward,exp
+son,backward,exp_family
 source for,terminate,neg
 source of,terminate,neg
 sources for,terminate,neg
@@ -662,9 +662,9 @@ though,terminate,neg
 to exclude,backward,neg
 today,terminate,histexp
 trigger event for,terminate,neg
-uncle,backward,exp
-uncle:,backward,exp
-uncle's,backward,exp
+uncle,backward,exp_family
+uncle:,backward,exp_family
+uncle's,backward,exp_family
 unlikely,forward,neg
 unremarkable for,backward,neg
 was found,terminate,histexp
@@ -674,7 +674,7 @@ was ruled out,forward,neg
 wasn't,backward,neg
 what must be ruled out is,backward,poss
 which,terminate,exp
-wife,backward,exp
+wife,backward,exp_family
 who,terminate,hypoexp
 will be ruled out,forward,poss
 will be ruled out for,backward,poss
