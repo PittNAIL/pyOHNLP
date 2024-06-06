@@ -4,13 +4,12 @@ import os
 import psycopg2
 import multiprocessing
 
-from util import parse_args
+from util import parse_args, add_meta_data
 
 args = parse_args()
 batch_size = 1000
 
 num_processes = multiprocessing.cpu_count()
-
 
 def append_ent_data(ent, source):
     if ent._.is_negated:
@@ -39,18 +38,6 @@ def append_ent_data(ent, source):
             "source": source,
             "rule" : str(ent._.literal)
             }
-#    return {
-#        "ent": str(ent),
-#        "negated": ent._.is_negated,
-#        "possible": ent._.is_possible,
-#        "hypothetical": ent._.is_hypothetical,
-#        "historical": ent._.is_historical,
-#        "is_exp": ent._.is_experiencer,
-#        "hist_exp": ent._.hist_experienced,
-#        "hypo_exp": ent._.hypo_experienced,
-#        "source": source,
-#        "rule": str(ent._.literal),
-#    }
 
 
 def process_text(text, nlp, source):
@@ -71,6 +58,11 @@ def process_records(args):
 
 def collect_data(nlp):
 
+    with open(args.db_conf, "r") as f:
+        config = json.load(f)
+
+    row_to_read = config["read_from"]["text_col"]
+
     data_to_collate = {
             "ent": [],
             "certainty": [],
@@ -79,21 +71,9 @@ def collect_data(nlp):
             "source": [],
             "rule": []
             }
+
     #TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
     # METADATA WILL NEED TO BE DEFINED IN HERE.
-
-#    data_to_collate = {
-#        "ent": [],
-#        "negated": [],
-#        "possible": [],
-#        "hypothetical": [],
-#        "historical": [],
-#        "is_exp": [],
-#        "hist_exp": [],
-#        "hypo_exp": [],
-#        "source": [],
-#        "rule": [],
-#    }
 
     manager = multiprocessing.Manager()
     shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
@@ -116,7 +96,7 @@ def collect_data(nlp):
             if args.file_path.endswith(".csv"):
                 with open(args.file_path, "r") as f:
                     rows = list(csv.DictReader(f, delimiter=",", quotechar='"'))
-                note_text = [row["note_text"] for row in rows]
+                note_text = [row[row_to_read] for row in rows]
                 args_list = [(text, args.file_path, nlp, shared_dtc) for text in note_text]
                 pool = multiprocessing.Pool(processes=num_processes)
                 pool.map(process_records, args_list)
@@ -131,8 +111,7 @@ def collect_data(nlp):
                 raise ValueError("Database Config file must be .json!")
 
             if (args.db_conf).endswith("json"):
-                with open(args.db_conf, "r") as f:
-                    conn_details = json.load(f)["read_from"]
+                conn_details = config["read_from"]
 
                 if conn_details["db_type"] == "postgresql":
                     db, user, host = (
