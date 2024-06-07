@@ -85,4 +85,3 @@ def get_literal(span):
     if literal.lower() == span.text.lower():
         return
     return literal
-

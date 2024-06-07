@@ -44,8 +44,8 @@ def main():
     if conf["write_to"]["to_csv"] == "True":
         df = pd.DataFrame.from_dict(data_to_collate)
         df.to_csv("medspacy_results_sample.csv", index=False)
-#    if conf["write_to"]["to_table"] is not None:
-#        write_to_db(data_to_collate, args.db_conf)
+    if conf["write_to"]["to_table"] is not None:
+        write_to_db(data_to_collate, args.db_conf)
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ batch_size = 1000
 
 num_processes = multiprocessing.cpu_count()
 
+
 def append_ent_data(ent, source, md):
     if ent._.is_negated:
         certainty = "Negated"
@@ -26,18 +27,18 @@ def append_ent_data(ent, source, md):
         experiencer = "Patient"
     if ent._.is_historical:
         status = "History"
-    if (ent._.hypo_experienced | ent._.hist_experienced):
+    if ent._.hypo_experienced | ent._.hist_experienced:
         status = "Other History"
     else:
         status = "Present"
     return {
-            "ent" : str(ent),
-            "certainty": certainty,
-            "status": status,
-            "experiencer": experiencer,
-            "source": source,
-            "rule" : str(ent._.literal)
-            } | md
+        "ent": str(ent),
+        "certainty": certainty,
+        "status": status,
+        "experiencer": experiencer,
+        "source": source,
+        "rule": str(ent._.literal),
+    } | md
 
 
 def process_text(text, nlp, source, md):
@@ -64,19 +65,19 @@ def collect_data(nlp):
     row_to_read, metadata = config["read_from"]["text_col"], config["read_from"]["meta_data"]
 
     data_to_collate = {
-            "ent": [],
-            "certainty": [],
-            "status": [],
-            "experiencer": [],
-            "source": [],
-            "rule": []
-            }
+        "ent": [],
+        "certainty": [],
+        "status": [],
+        "experiencer": [],
+        "source": [],
+        "rule": [],
+    }
 
     if metadata is not None:
         for md in metadata:
             data_to_collate[md] = []
 
-    #TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
+    # TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
     # METADATA WILL NEED TO BE DEFINED IN HERE.
 
     manager = multiprocessing.Manager()
@@ -101,7 +102,9 @@ def collect_data(nlp):
                 with open(args.file_path, "r") as f:
                     rows = list(csv.DictReader(f, delimiter=",", quotechar='"'))
                 note_text = [(row[row_to_read], {md: row[md] for md in metadata}) for row in rows]
-                args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text]
+                args_list = [
+                    (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
+                ]
                 pool = multiprocessing.Pool(processes=num_processes)
                 pool.map(process_records, args_list)
                 data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
@@ -116,8 +119,9 @@ def collect_data(nlp):
 
             if (args.db_conf).endswith("json"):
                 conn_details = config["read_from"]
+                db_used = conn_details["db_type"]
 
-                if conn_details["db_type"] == "postgresql":
+                if db_used == "postgresql":
                     db, user, host = (
                         conn_details["database"],
                         conn_details["user"],
@@ -144,7 +148,9 @@ def collect_data(nlp):
                     connect.close()
                     data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
-                if conn_details["db_type"] != "postgresql":
-                    raise ValueError(f"Database not supported! Please consider using postgresql if you'd like to read or write to database")
+                if db_used != "postgresql":
+                    raise ValueError(
+                        f"Database type {db_used} not supported! Please consider using postgresql if you'd like to read or write to database"
+                    )
 
     return data_to_collate

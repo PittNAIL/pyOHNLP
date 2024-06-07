@@ -11,6 +11,7 @@ args = parse_args()
 with open(args.db_conf, "r") as f:
     config = json.load(f)
 
+
 def write_to_db(dtc, config):
     columns = list(dtc.keys())
     rows = zip(*[dtc[col] for col in columns])
