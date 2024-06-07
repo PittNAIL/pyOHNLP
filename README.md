@@ -17,8 +17,9 @@ python loader.py --ruleset_dir <PATH TO RULESET> --context_file <PATH TO CONTEXT
 ## Databases (PostgreSQL only as of 5/23/24):
 Connecting to databases can be done with a .json file with your desired configuration, a template is
 provided below:
+
 ```json
-{"config" : {
+{"read_from" : {
     "db_type": "postgresql",
     "database": "DB_NAME",
     "user": "DB_USER",
@@ -26,12 +27,26 @@ provided below:
     "host": "HOST",
     "input_table": "TABLE_TO_GET_NOTES_FROM",
     "text_col": "TEXT_COLUMN_OF_TABLE",
-    "id_col": "IDENTIFIER_COLUMN_OF_TABLE"
-    }
+    "id_col": "IDENTIFIER_COLUMN_OF_TABLE",
+    "meta_data": "LIST_OF_METADATA_COLS"
+    },
+"write_to": {
+    "db_type": "postgresql",
+    "database": "DB_NAME",
+    "user": "DB_USER",
+    "password": "USER_PASSWORD",
+    "host": "HOST",
+    "to_table": "OUTPUT_WRITE_TABLE",
+    "to_csv" : "TRUE" or "FALSE", will write output to .csv.
+    },
+"ruleset_dir": "DIRECTORY TO RULESET"
 }
+
 ```
 
 Execution of the pipeline with your database can be achieved with the command
+NOTE: The ruleset_dir and context_file arguments are optional, as there is a default context file,
+and the ruleset_dir can be included in your db_conf.json.
 ```python
 python loader.py --ruleset_dir <PATH TO RULESET> --context_file <PATH TO CONTEXT FILE> --db_conf
 <PATH TO DB CONFIG>
@@ -40,6 +55,6 @@ python loader.py --ruleset_dir <PATH TO RULESET> --context_file <PATH TO CONTEXT
 MediTag has been implemented by [Jordan Hilsman][jordan] from [PittNail][pn] at the [University of Pittsburgh][pitt].
 
 [medspacy]: https://github.com/medspacy/medspacy
-[jordan]: https://github.com/jordanhilsman
+[jordan]: https://jordanhilsman.github.io
 [pn]: https://pittnail.github.io
 [pitt]: https://shrs.pitt.edu
