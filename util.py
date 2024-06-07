@@ -17,7 +17,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         help="path to context rules",
         required=False,
-        default="context_rules.txt",
+        default="context_rules_v1.txt",
     )
     parser.add_argument(
         "--db_conf",

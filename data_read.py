@@ -11,7 +11,7 @@ batch_size = 1000
 
 num_processes = multiprocessing.cpu_count()
 
-def append_ent_data(ent, source):
+def append_ent_data(ent, source, md):
     if ent._.is_negated:
         certainty = "Negated"
     elif ent._.is_possible:
@@ -37,20 +37,20 @@ def append_ent_data(ent, source):
             "experiencer": experiencer,
             "source": source,
             "rule" : str(ent._.literal)
-            }
+            } | md
 
 
-def process_text(text, nlp, source):
+def process_text(text, nlp, source, md):
     doc = nlp(text)
     results = []
     for ent in doc.ents:
-        results.append(append_ent_data(ent, source))
+        results.append(append_ent_data(ent, source, md))
     return results
 
 
 def process_records(args):
-    text, source, nlp, shared_dtc = args
-    results = process_text(text, nlp, source)
+    text, source, nlp, shared_dtc, md = args
+    results = process_text(text, nlp, source, md)
     for result in results:
         for key in shared_dtc.keys():
             shared_dtc[key].append(result[key])
@@ -61,7 +61,7 @@ def collect_data(nlp):
     with open(args.db_conf, "r") as f:
         config = json.load(f)
 
-    row_to_read = config["read_from"]["text_col"]
+    row_to_read, metadata = config["read_from"]["text_col"], config["read_from"]["meta_data"]
 
     data_to_collate = {
             "ent": [],
@@ -71,6 +71,10 @@ def collect_data(nlp):
             "source": [],
             "rule": []
             }
+
+    if metadata is not None:
+        for md in metadata:
+            data_to_collate[md] = []
 
     #TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
     # METADATA WILL NEED TO BE DEFINED IN HERE.
@@ -96,8 +100,8 @@ def collect_data(nlp):
             if args.file_path.endswith(".csv"):
                 with open(args.file_path, "r") as f:
                     rows = list(csv.DictReader(f, delimiter=",", quotechar='"'))
-                note_text = [row[row_to_read] for row in rows]
-                args_list = [(text, args.file_path, nlp, shared_dtc) for text in note_text]
+                note_text = [(row[row_to_read], {md: row[md] for md in metadata}) for row in rows]
+                args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text]
                 pool = multiprocessing.Pool(processes=num_processes)
                 pool.map(process_records, args_list)
                 data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
