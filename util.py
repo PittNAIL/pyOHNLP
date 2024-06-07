@@ -86,8 +86,3 @@ def get_literal(span):
         return
     return literal
 
-def add_meta_data(db_conf, dtc):
-    meta_data = db_conf['read_from']['meta_data']
-    for md in meta_data:
-        dtc[md] = []
-

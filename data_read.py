@@ -4,7 +4,7 @@ import os
 import psycopg2
 import multiprocessing
 
-from util import parse_args, add_meta_data
+from util import parse_args
 
 args = parse_args()
 batch_size = 1000
