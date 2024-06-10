@@ -1,13 +1,15 @@
 import json
-import csv
 import os
 import psycopg2
 import multiprocessing
+
+import pandas as pd
 
 from util import parse_args
 
 args = parse_args()
 batch_size = 1000
+lock = multiprocessing.Lock()
 
 num_processes = multiprocessing.cpu_count()
 
@@ -53,8 +55,9 @@ def process_records(args):
     text, source, nlp, shared_dtc, md = args
     results = process_text(text, nlp, source, md)
     for result in results:
-        for key in shared_dtc.keys():
-            shared_dtc[key].append(result[key])
+        with lock:
+            for key in shared_dtc.keys():
+                shared_dtc[key].append(result[key])
 
 
 def collect_data(nlp):
@@ -99,14 +102,17 @@ def collect_data(nlp):
 
         if os.path.isfile(args.file_path):
             if args.file_path.endswith(".csv"):
-                with open(args.file_path, "r") as f:
-                    rows = list(csv.DictReader(f, delimiter=",", quotechar='"'))
-                note_text = [(row[row_to_read], {md: row[md] for md in metadata}) for row in rows]
-                args_list = [
-                    (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
-                ]
-                pool = multiprocessing.Pool(processes=num_processes)
-                pool.map(process_records, args_list)
+                chunk_size = 1000
+                for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
+                    note_text = [(row[row_to_read], {md: row[md] for md in metadata}) for _, row in
+                                 chunk.iterrows()]
+                    args_list = [
+                        (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
+                    ]
+                    pool = multiprocessing.Pool(processes=num_processes)
+                    pool.map(process_records, args_list)
+                    pool.close()
+                    pool.join()
                 data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
             else:

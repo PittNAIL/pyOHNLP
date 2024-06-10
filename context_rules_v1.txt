@@ -689,3 +689,14 @@ yet,terminate,neg
 returned negative,forward,neg
 sometimes,pseudo,hypo
 eval,backward,hypo
+dose decrease,pseudo,dose
+decrease dose,pseudo,dose
+discontinue,pseudo,dose
+dicontinuation,pseudo,dose
+delay,pseudo,dose
+hold,pseudo,dose
+dose reduction,pseudo,dose
+reduce dose,pseudo,dose
+reduce frequency,pseudo,dose
+frequency reduction,pseudo,dose
+stop,pseudo,dose

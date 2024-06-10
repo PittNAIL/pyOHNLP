@@ -50,12 +50,16 @@ def get_context_rules(CONTEXT_FILE):
 
 
 def compile_target_rules(rule_path):
+    print(f"Getting matcher rules from {rule_path}")
     with open(rule_path, "r") as f:
         rules = f.readlines()
     target_rules = []
     for line in rules:
         rule = line.strip()
-        rulename = rule_path.split("_re")[-1].split(".txt")[0]
+        if "_re" in rule_path:
+            rulename = rule_path.split("_re")[-1].split(".txt")[0]
+        elif "/" in rule_path:
+            rulename = rule_path.split("/")[-1].split(".txt")[0]
         target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rule}"))
     return target_rules
 
