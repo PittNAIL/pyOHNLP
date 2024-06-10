@@ -2,6 +2,8 @@ import json
 import os
 import psycopg2
 import multiprocessing
+import time
+import logging
 
 import pandas as pd
 
@@ -60,6 +62,13 @@ def process_records(args):
             for key in shared_dtc.keys():
                 shared_dtc[key].append(result[key])
 
+def log_shared_dtc_lengths(shared_dtc):
+    while True:
+        lengths = {key: len(shared_dtc[key]) for key in shared_dtc.keys()}
+        logging.info(f"Lengths of shared_dtc: {lengths}")
+        time.sleep(2)  # Log every 2 seconds
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 def collect_data(nlp):
 
@@ -82,11 +91,11 @@ def collect_data(nlp):
         for md in metadata:
             data_to_collate[md] = []
 
-    # TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
-    # METADATA WILL NEED TO BE DEFINED IN HERE.
-
     manager = multiprocessing.Manager()
     shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
+
+    logger_process = multiprocessing.Process(target=log_shared_dtc_lengths, args=(shared_dtc,))
+    logger_process.start()
 
     if (args.db_conf is None) & (args.file_path is None):
         raise ValueError("No input to process! --file_path or --db_conf argument needed!")
@@ -162,5 +171,7 @@ def collect_data(nlp):
                     raise ValueError(
                         f"Database type {db_used} not supported! Please consider using postgresql if you'd like to read or write to database"
                     )
+
+    logger_process.terminate()
 
     return data_to_collate
