@@ -2,17 +2,30 @@ import json
 import os
 import psycopg2
 import multiprocessing
-
 import pandas as pd
+import threading
+import medspacy
 
-from util import parse_args
+from util import parse_args, set_extensions, compile_target_rules, get_context_rules
+
+CONTEXT_ATTRS = {
+    "NEG": {"is_negated": True},
+    "POSS": {"is_possible": True},
+    "HYPO": {"is_hypothetical": True},
+    "HIST": {"is_historical": True},
+    "EXP_FAMILY": {"fam_experiencer": True},
+    "HISTEXP": {"hist_experienced": True},
+    "HYPOEXP": {"hypo_experienced": True},
+    "DOSE": {"dose_exp": True},
+}
+
+set_extensions(CONTEXT_ATTRS)
 
 args = parse_args()
 batch_size = 1000
 lock = multiprocessing.Lock()
 
 num_processes = multiprocessing.cpu_count()
-
 
 def append_ent_data(ent, source, md):
     if ent._.is_negated:
@@ -38,11 +51,10 @@ def append_ent_data(ent, source, md):
         "certainty": certainty,
         "status": status,
         "experiencer": experiencer,
-        "dose_status": ent._.dose_dec,
         "source": source,
         "rule": str(ent._.literal),
+        "dose_status": ent._.dose_exp,
     } | md
-
 
 def process_text(text, nlp, source, md):
     doc = nlp(text)
@@ -51,8 +63,8 @@ def process_text(text, nlp, source, md):
         results.append(append_ent_data(ent, source, md))
     return results
 
-
 def process_records(args):
+    fixit()
     text, source, nlp, shared_dtc, md = args
     results = process_text(text, nlp, source, md)
     for result in results:
@@ -60,9 +72,35 @@ def process_records(args):
             for key in shared_dtc.keys():
                 shared_dtc[key].append(result[key])
 
+def fixit():
+    args = parse_args()
+    with open(args.db_conf, "r") as f:
+        conf = json.load(f)
+    nlp = medspacy.load()
+    nlp.remove_pipe("medspacy_context")
+    CONTEXT_ATTRS = {
+        "NEG": {"is_negated": True},
+        "POSS": {"is_possible": True},
+        "HYPO": {"is_hypothetical": True},
+        "HIST": {"is_historical": True},
+        "EXP_FAMILY": {"fam_experiencer": True},
+        "HISTEXP": {"hist_experienced": True},
+        "HYPOEXP": {"hypo_experienced": True},
+        "DOSE": {"dose_exp": True},
+    }
+    set_extensions(CONTEXT_ATTRS)
+    context_rules_list = get_context_rules(args.context_file)
+    context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
+    context.add(context_rules_list)
+
+    rule_files = [
+        os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
+    ]
+    target_matcher = nlp.get_pipe("medspacy_target_matcher")
+    for file in rule_files:
+        target_matcher.add(compile_target_rules(file))
 
 def collect_data(nlp):
-
     with open(args.db_conf, "r") as f:
         config = json.load(f)
 
@@ -82,11 +120,9 @@ def collect_data(nlp):
         for md in metadata:
             data_to_collate[md] = []
 
-    # TODO: ADD METADATA AND CUSTOM FLAGS, CUSTOM FLAGS MAY BE DOABLE IN LOADER.PY, BUT
-    # METADATA WILL NEED TO BE DEFINED IN HERE.
-
     manager = multiprocessing.Manager()
     shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
+
 
     if (args.db_conf is None) & (args.file_path is None):
         raise ValueError("No input to process! --file_path or --db_conf argument needed!")
@@ -100,25 +136,15 @@ def collect_data(nlp):
                 texts.append((txt, file, nlp, shared_dtc))
             pool = multiprocessing.Pool(processes=num_processes)
             pool.map(process_records, texts)
-            data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
         if os.path.isfile(args.file_path):
             if args.file_path.endswith(".csv"):
-                chunk_size = 1000
+                chunk_size = 100
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
-                    note_text = [
-                        (row[row_to_read], {md: row[md] for md in metadata})
-                        for _, row in chunk.iterrows()
-                    ]
-                    args_list = [
-                        (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
-                    ]
+                    note_text = [(row[row_to_read], {md: row[md] for md in metadata}) for _, row in chunk.iterrows()]
+                    args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
-                    pool.close()
-                    pool.join()
-                data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
-
             else:
                 raise ValueError(".zip compatibility not yet implemented.")
 
@@ -145,22 +171,17 @@ def collect_data(nlp):
                     cursor = connect.cursor()
                     cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
 
-                    with multiprocessing.Pool(num_processes) as pool:
-                        while True:
-                            records = cursor.fetchmany(batch_size)
-                            if not records:
-                                break
-                            pool.map(
-                                process_records,
-                                [(record[0], record[1], nlp, shared_dtc) for record in records],
-                            )
+                    while True:
+                        records = cursor.fetchmany(batch_size)
+                        if not records:
+                            break
+                        pool = multiprocessing.Pool(processes=num_processes)
+                        pool.map(
+                            process_records,
+                            [(record[0], record[1], nlp, shared_dtc) for record in records],
+                        )
 
                     connect.close()
-                    data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
-                if db_used != "postgresql":
-                    raise ValueError(
-                        f"Database type {db_used} not supported! Please consider using postgresql if you'd like to read or write to database"
-                    )
+    return {key: list(value) for key, value in shared_dtc.items()}
 
-    return data_to_collate
