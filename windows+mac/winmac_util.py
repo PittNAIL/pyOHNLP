@@ -8,6 +8,7 @@ from medspacy.ner import TargetRule
 
 from spacy.tokens import Doc, Span, Token
 
+
 def parse_args() -> argparse.Namespace:
     """Parses the command line arguments."""
 

@@ -3,7 +3,6 @@ import os
 import psycopg2
 import multiprocessing
 import pandas as pd
-import threading
 import medspacy
 
 from util import parse_args, set_extensions, compile_target_rules, get_context_rules
@@ -26,6 +25,7 @@ batch_size = 1000
 lock = multiprocessing.Lock()
 
 num_processes = multiprocessing.cpu_count()
+
 
 def append_ent_data(ent, source, md):
     if ent._.is_negated:
@@ -56,12 +56,14 @@ def append_ent_data(ent, source, md):
         "dose_status": ent._.dose_exp,
     } | md
 
+
 def process_text(text, nlp, source, md):
     doc = nlp(text)
     results = []
     for ent in doc.ents:
         results.append(append_ent_data(ent, source, md))
     return results
+
 
 def process_records(args):
     fixit()
@@ -71,6 +73,7 @@ def process_records(args):
         with lock:
             for key in shared_dtc.keys():
                 shared_dtc[key].append(result[key])
+
 
 def fixit():
     args = parse_args()
@@ -100,6 +103,7 @@ def fixit():
     for file in rule_files:
         target_matcher.add(compile_target_rules(file))
 
+
 def collect_data(nlp):
     with open(args.db_conf, "r") as f:
         config = json.load(f)
@@ -123,7 +127,6 @@ def collect_data(nlp):
     manager = multiprocessing.Manager()
     shared_dtc = manager.dict({key: manager.list() for key in data_to_collate.keys()})
 
-
     if (args.db_conf is None) & (args.file_path is None):
         raise ValueError("No input to process! --file_path or --db_conf argument needed!")
 
@@ -141,8 +144,13 @@ def collect_data(nlp):
             if args.file_path.endswith(".csv"):
                 chunk_size = 100
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
-                    note_text = [(row[row_to_read], {md: row[md] for md in metadata}) for _, row in chunk.iterrows()]
-                    args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text]
+                    note_text = [
+                        (row[row_to_read], {md: row[md] for md in metadata})
+                        for _, row in chunk.iterrows()
+                    ]
+                    args_list = [
+                        (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
+                    ]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
             else:
@@ -184,4 +192,3 @@ def collect_data(nlp):
                     connect.close()
 
     return {key: list(value) for key, value in shared_dtc.items()}
-

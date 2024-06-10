@@ -23,7 +23,6 @@ CONTEXT_ATTRS = {
 }
 
 
-
 def main():
     args = util.parse_args()
     with open(args.db_conf, "r") as f:
@@ -36,7 +35,7 @@ def main():
     context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
     context.add(context_rules_list)
 
-   # rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
+    # rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
     rule_files = [
         os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
     ]
@@ -52,6 +51,7 @@ def main():
     if conf["write_to"]["to_table"] != "None":
         write_to_db(data_to_collate, args.db_conf)
     print("Process finished --- %s seconds ---" % (time.time() - start_time))
+
 
 if __name__ == "__main__":
     main()
