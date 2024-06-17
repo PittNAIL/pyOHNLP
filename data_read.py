@@ -7,7 +7,7 @@ import logging
 
 import pandas as pd
 
-from util import parse_args
+from util import parse_args, get_versioning
 
 args = parse_args()
 batch_size = 1000
@@ -15,6 +15,7 @@ lock = multiprocessing.Lock()
 
 num_processes = multiprocessing.cpu_count()
 
+version = get_versioning("versions.json", "db_conf.json")
 
 def append_ent_data(ent, source, md):
     if ent._.is_negated:
@@ -43,6 +44,8 @@ def append_ent_data(ent, source, md):
         "dose_status": ent._.dose_dec,
         "source": source,
         "rule": str(ent._.literal),
+        "offset": ent.start_char,
+        "version": version,
     } | md
 
 
@@ -85,6 +88,8 @@ def collect_data(nlp):
         "dose_status": [],
         "source": [],
         "rule": [],
+        "offset": [],
+        "version": [],
     }
 
     if metadata is not None:
