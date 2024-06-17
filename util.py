@@ -98,8 +98,11 @@ def get_versioning(software, config):
     with open(config, "r") as f:
         conf = json.load(f)
     ruleset_dir = conf['ruleset_dir']
-    with open(os.path.join(ruleset_dir, "VERSION.json"), "r") as f:
-        rule_version = json.load(f)
+    if "VERSION.json" in os.listdir(ruleset_dir):
+        with open(os.path.join(ruleset_dir, "VERSION.json"), "r") as f:
+            rule_version = json.load(f)
+    else:
+        rule_version = {'Version': 'Not given'}
     meditag_version = mt_versions['MediTag']
     context_version = mt_versions['ConText']
     ruleset_version = list(rule_version.items())[0]

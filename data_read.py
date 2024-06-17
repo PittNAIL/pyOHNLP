@@ -17,7 +17,7 @@ num_processes = multiprocessing.cpu_count()
 
 version = get_versioning("versions.json", "db_conf.json")
 
-def append_ent_data(ent, source, md):
+def append_ent_data(ent, source, md, idx):
     if ent._.is_negated:
         certainty = "Negated"
     elif ent._.is_possible:
@@ -46,20 +46,21 @@ def append_ent_data(ent, source, md):
         "rule": str(ent._.literal),
         "offset": ent.start_char,
         "version": version,
+        "index": idx
     } | md
 
 
-def process_text(text, nlp, source, md):
+def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
     results = []
     for ent in doc.ents:
-        results.append(append_ent_data(ent, source, md))
+        results.append(append_ent_data(ent, source, md, idx))
     return results
 
 
 def process_records(args):
-    text, source, nlp, shared_dtc, md = args
-    results = process_text(text, nlp, source, md)
+    text, source, nlp, shared_dtc, md, idx = args
+    results = process_text(text, nlp, source, md, idx)
     for result in results:
         with lock:
             for key in shared_dtc.keys():
@@ -90,6 +91,7 @@ def collect_data(nlp):
         "rule": [],
         "offset": [],
         "version": [],
+        "index": [],
     }
 
     if metadata is not None:
@@ -121,11 +123,11 @@ def collect_data(nlp):
                 chunk_size = 1000
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
                     note_text = [
-                        (row[row_to_read], {md: row[md] for md in metadata})
-                        for _, row in chunk.iterrows()
+                        (row[row_to_read], {md: row[md] for md in metadata}, idx)
+                        for idx, row in chunk.iterrows()
                     ]
                     args_list = [
-                        (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
+                        (text[0], args.file_path, nlp, shared_dtc, text[1], text[2]) for text in note_text
                     ]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
@@ -156,8 +158,12 @@ def collect_data(nlp):
                     table = conn_details["input_table"]
                     text_col = conn_details["text_col"]
                     ident = conn_details["id_col"]
+                    grab = [text_col, ident]
+                    md = conn_details['meta_data']
+                    grab.extend(md)
+                    grab = ', '.join(grab)
                     cursor = connect.cursor()
-                    cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
+                    cursor.execute(f"select {grab} from {table} limit 150")
 
                     with multiprocessing.Pool(num_processes) as pool:
                         while True:
@@ -166,7 +172,8 @@ def collect_data(nlp):
                                 break
                             pool.map(
                                 process_records,
-                                [(record[0], record[1], nlp, shared_dtc) for record in records],
+                                [(record[0], table, nlp, shared_dtc, {md[i]: record[i+2] for i in
+                                                                      range(len(md))}, record[1]) for record in records],
                             )
 
                     connect.close()

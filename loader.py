@@ -7,6 +7,7 @@ import pandas as pd
 
 from data_read import collect_data
 from dbwriter import write_to_db
+from enact_module import enact_transform
 
 CONTEXT_ATTRS = {
     "NEG": {"is_negated": True},
@@ -43,11 +44,14 @@ def main():
 
     data_to_collate = collect_data(nlp)
 
+    df = pd.DataFrame.from_dict(data_to_collate)
+    if conf['enact'] == "True":
+        df = enact_transform(df)
+
     if conf["write_to"]["to_csv"] == "True":
-        df = pd.DataFrame.from_dict(data_to_collate)
         df.to_csv("medspacy_results_sample.csv", index=False)
     if conf["write_to"]["to_table"] != "None":
-        write_to_db(data_to_collate, args.db_conf)
+        write_to_db(df, args.db_conf)
 
 
 if __name__ == "__main__":
