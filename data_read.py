@@ -163,7 +163,7 @@ def collect_data(nlp):
                     grab.extend(md)
                     grab = ', '.join(grab)
                     cursor = connect.cursor()
-                    cursor.execute(f"select {grab} from {table} limit 150")
+                    cursor.execute(f"select {grab} from {table} limit 15")
 
                     with multiprocessing.Pool(num_processes) as pool:
                         while True:
