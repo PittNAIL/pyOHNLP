@@ -41,7 +41,6 @@ def enact_transform(dtc: pd.DataFrame):
     transform["DOWNLOAD_DATE"] = None
     transform["CONFIDENCE_NUM"] = None
     transform["LOCATION_CD"] = None
-    transform["UPDATE_DATE"] = None
     transform.drop(columns=['modifier', 'ent', 'dose_status', 'source', 'visit_id'], inplace=True)
     print(transform)
     transform.to_csv("helper.csv", index=False)
