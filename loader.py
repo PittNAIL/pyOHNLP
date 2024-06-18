@@ -45,7 +45,7 @@ def main():
     data_to_collate = collect_data(nlp)
 
     df = pd.DataFrame.from_dict(data_to_collate)
-    if conf['enact'] == "True":
+    if conf["enact"] == "True":
         df = enact_transform(df)
 
     if conf["write_to"]["to_csv"] == "True":

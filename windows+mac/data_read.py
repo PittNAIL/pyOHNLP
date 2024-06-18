@@ -4,8 +4,6 @@ import psycopg2
 import multiprocessing
 import pandas as pd
 import medspacy
-import util
-import logging
 
 from util import parse_args, set_extensions, compile_target_rules, get_context_rules, get_versioning
 
@@ -29,6 +27,7 @@ lock = multiprocessing.Lock()
 num_processes = multiprocessing.cpu_count()
 
 version = get_versioning("versions.json", "db_conf.json")
+
 
 def append_ent_data(ent, source, md, idx):
     if ent._.is_negated:
@@ -158,7 +157,8 @@ def collect_data(nlp):
                         for idx, row in chunk.iterrows()
                     ]
                     args_list = [
-                        (text[0], args.file_path, nlp, shared_dtc, text[1], text[2]) for text in note_text
+                        (text[0], args.file_path, nlp, shared_dtc, text[1], text[2])
+                        for text in note_text
                     ]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
@@ -188,7 +188,7 @@ def collect_data(nlp):
                     grab = [text_col, ident]
                     md = conn_details["meta_data"]
                     grab.extend(md)
-                    grab = ', '.join(grab)
+                    grab = ", ".join(grab)
                     cursor = connect.cursor()
                     cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
 
@@ -199,8 +199,17 @@ def collect_data(nlp):
                         pool = multiprocessing.Pool(processes=num_processes)
                         pool.map(
                             process_records,
-                            [(record[0], table, nlp, shared_dtc, {md[i]: record[i+2] for i in
-                                                                  range(len(md))}, record[1]) for record in records],
+                            [
+                                (
+                                    record[0],
+                                    table,
+                                    nlp,
+                                    shared_dtc,
+                                    {md[i]: record[i + 2] for i in range(len(md))},
+                                    record[1],
+                                )
+                                for record in records
+                            ],
                         )
 
                     connect.close()

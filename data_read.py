@@ -17,6 +17,7 @@ num_processes = multiprocessing.cpu_count()
 
 version = get_versioning("versions.json", "db_conf.json")
 
+
 def append_ent_data(ent, source, md, idx):
     if ent._.is_negated:
         certainty = "Negated"
@@ -46,7 +47,7 @@ def append_ent_data(ent, source, md, idx):
         "rule": str(ent._.literal),
         "offset": ent.start_char,
         "version": version,
-        "index": idx
+        "index": idx,
     } | md
 
 
@@ -66,13 +67,16 @@ def process_records(args):
             for key in shared_dtc.keys():
                 shared_dtc[key].append(result[key])
 
+
 def log_shared_dtc_lengths(shared_dtc):
     while True:
         lengths = {key: len(shared_dtc[key]) for key in shared_dtc.keys()}
         logging.info(f"Lengths of shared_dtc: {lengths}")
         time.sleep(2)  # Log every 2 seconds
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+
 
 def collect_data(nlp):
 
@@ -127,7 +131,8 @@ def collect_data(nlp):
                         for idx, row in chunk.iterrows()
                     ]
                     args_list = [
-                        (text[0], args.file_path, nlp, shared_dtc, text[1], text[2]) for text in note_text
+                        (text[0], args.file_path, nlp, shared_dtc, text[1], text[2])
+                        for text in note_text
                     ]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
@@ -159,9 +164,9 @@ def collect_data(nlp):
                     text_col = conn_details["text_col"]
                     ident = conn_details["id_col"]
                     grab = [text_col, ident]
-                    md = conn_details['meta_data']
+                    md = conn_details["meta_data"]
                     grab.extend(md)
-                    grab = ', '.join(grab)
+                    grab = ", ".join(grab)
                     cursor = connect.cursor()
                     cursor.execute(f"select {grab} from {table} limit 15")
 
@@ -172,8 +177,17 @@ def collect_data(nlp):
                                 break
                             pool.map(
                                 process_records,
-                                [(record[0], table, nlp, shared_dtc, {md[i]: record[i+2] for i in
-                                                                      range(len(md))}, record[1]) for record in records],
+                                [
+                                    (
+                                        record[0],
+                                        table,
+                                        nlp,
+                                        shared_dtc,
+                                        {md[i]: record[i + 2] for i in range(len(md))},
+                                        record[1],
+                                    )
+                                    for record in records
+                                ],
                             )
 
                     connect.close()
