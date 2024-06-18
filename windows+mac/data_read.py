@@ -4,8 +4,10 @@ import psycopg2
 import multiprocessing
 import pandas as pd
 import medspacy
+import util
+import logging
 
-from util import parse_args, set_extensions, compile_target_rules, get_context_rules
+from util import parse_args, set_extensions, compile_target_rules, get_context_rules, get_versioning
 
 CONTEXT_ATTRS = {
     "NEG": {"is_negated": True},
@@ -26,8 +28,9 @@ lock = multiprocessing.Lock()
 
 num_processes = multiprocessing.cpu_count()
 
+version = get_versioning("versions.json", "db_conf.json")
 
-def append_ent_data(ent, source, md):
+def append_ent_data(ent, source, md, idx):
     if ent._.is_negated:
         certainty = "Negated"
     elif ent._.is_possible:
@@ -51,13 +54,16 @@ def append_ent_data(ent, source, md):
         "certainty": certainty,
         "status": status,
         "experiencer": experiencer,
+        "dose_status": ent._.dose_exp,
         "source": source,
         "rule": str(ent._.literal),
-        "dose_status": ent._.dose_exp,
+        "offset": ent.start_char,
+        "version": version,
+        "index": idx,
     } | md
 
 
-def process_text(text, nlp, source, md):
+def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
     results = []
     for ent in doc.ents:
@@ -67,8 +73,8 @@ def process_text(text, nlp, source, md):
 
 def process_records(args):
     fixit()
-    text, source, nlp, shared_dtc, md = args
-    results = process_text(text, nlp, source, md)
+    text, source, nlp, shared_dtc, md, idx = args
+    results = process_text(text, nlp, source, md, idx)
     for result in results:
         with lock:
             for key in shared_dtc.keys():
@@ -118,6 +124,9 @@ def collect_data(nlp):
         "dose_status": [],
         "source": [],
         "rule": [],
+        "offset": [],
+        "version": [],
+        "index": [],
     }
 
     if metadata is not None:
@@ -176,6 +185,10 @@ def collect_data(nlp):
                     table = conn_details["input_table"]
                     text_col = conn_details["text_col"]
                     ident = conn_details["id_col"]
+                    grab = [text_col, ident]
+                    md = conn_details["meta_data"]
+                    grab.extend(md)
+                    grab = ', '.join(grab)
                     cursor = connect.cursor()
                     cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
 
@@ -186,7 +199,8 @@ def collect_data(nlp):
                         pool = multiprocessing.Pool(processes=num_processes)
                         pool.map(
                             process_records,
-                            [(record[0], record[1], nlp, shared_dtc) for record in records],
+                            [(record[0], table, nlp, shared_dtc, {md[i]: record[i+2] for i in
+                                                                  range(len(md))}, record[1]) for record in records],
                         )
 
                     connect.close()
