@@ -1,7 +1,8 @@
 import argparse
 import tqdm
-
+import json
 import pandas as pd
+import os
 
 from medspacy.context import ConTextRule
 from medspacy.ner import TargetRule
@@ -89,3 +90,21 @@ def get_literal(span):
     if literal.lower() == span.text.lower():
         return
     return literal
+
+
+def get_versioning(software, config):
+    with open(software, "r") as f:
+        mt_versions = json.load(f)
+    with open(config, "r") as f:
+        conf = json.load(f)
+    ruleset_dir = conf['ruleset_dir']
+    if "VERSION.json" in os.listdir(ruleset_dir):
+        with open(os.path.join(ruleset_dir, "VERSION.json"), "r") as f:
+            rule_version = json.load(f)
+    else:
+        rule_version = {'Version': 'Not given'}
+    meditag_version = mt_versions['MediTag']
+    context_version = mt_versions['ConText']
+    ruleset_version = list(rule_version.items())[0]
+    versioning = f"MediTag:{meditag_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
+    return versioning

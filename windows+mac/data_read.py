@@ -67,7 +67,7 @@ def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
     results = []
     for ent in doc.ents:
-        results.append(append_ent_data(ent, source, md))
+        results.append(append_ent_data(ent, source, md, idx))
     return results
 
 
@@ -154,11 +154,11 @@ def collect_data(nlp):
                 chunk_size = 100
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
                     note_text = [
-                        (row[row_to_read], {md: row[md] for md in metadata})
-                        for _, row in chunk.iterrows()
+                        (row[row_to_read], {md: row[md] for md in metadata}, idx)
+                        for idx, row in chunk.iterrows()
                     ]
                     args_list = [
-                        (text[0], args.file_path, nlp, shared_dtc, text[1]) for text in note_text
+                        (text[0], args.file_path, nlp, shared_dtc, text[1], text[2]) for text in note_text
                     ]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
