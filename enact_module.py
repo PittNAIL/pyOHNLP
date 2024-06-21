@@ -1,10 +1,6 @@
 import pandas as pd
 import datetime
 
-# cols = instance_num,
-
-# meta_data = provider_id, start_date, patient_num, project_name (MIGHT NOT BE APPLICABLE HERE..
-
 id_vars = [
     "ent",
     "dose_status",
@@ -21,7 +17,6 @@ id_vars = [
 
 
 def enact_transform(dtc: pd.DataFrame):
-    print(dtc)
     data_keys = dtc.columns
     if "project_name" not in data_keys:
         project_name = input("Missing project name! What is the project for this run?")

@@ -19,7 +19,7 @@ num_processes = multiprocessing.cpu_count()
 version = get_versioning("versions.json", "db_conf.json")
 
 
-def append_ent_data(ent, source, md, idx):
+def append_ent_data(ent, source, md:None, idx):
     if ent._.is_negated:
         certainty = "Negated"
     elif ent._.is_possible:
@@ -49,8 +49,7 @@ def append_ent_data(ent, source, md, idx):
         "offset": ent.start_char,
         "version": version,
         "index": idx,
-    } | md
-
+        } | md
 
 def process_text(text, nlp, source, md, idx):
     doc = nlp(text)

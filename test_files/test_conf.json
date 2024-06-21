@@ -1,0 +1,13 @@
+{
+"ruleset_dir":"./test_files/test_ruleset",
+"enact":"False",
+"read_from":{
+    "text_col":"note_text",
+    "ident":"note_id",
+    "meta_data": ["note_id"]
+},
+"write_to":{
+    "to_csv":"True",
+    "to_table":"None"
+}
+}
