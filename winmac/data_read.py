@@ -27,7 +27,7 @@ lock = multiprocessing.Lock()
 
 num_processes = multiprocessing.cpu_count()
 
-version = get_versioning("versions.json", "db_conf.json")
+version = get_versioning("versions.json", args.db_conf)
 
 
 def append_ent_data(ent, source, md, idx):
