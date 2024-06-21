@@ -1,11 +1,12 @@
-# MediTag
-[MedSpaCy][medspacy] based NER for clinical notes using ConText algorithm modifiers. Supports
+# pyOHNLP
+The pyOHNLP Toolkit is a python-based open health natural language processing software using 
+[MedSpaCy][medspacy] as a framework for NER in clinical notes using ConText algorithm modifiers. Supports
 read/write capabilities for local filesystems (.txt, .zip, .csv) and SQL databases (PostgreSQL,
 SQLite)
 
 <p align=center>
     <img src="https://img.shields.io/badge/build-partial-orange" alt="Build Status">
-    <img src="https://img.shields.io/badge/Version-0.41-orange" alt="Version">
+    <img src="https://img.shields.io/badge/Version-1.0-green" alt="Version">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
 
