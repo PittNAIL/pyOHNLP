@@ -700,3 +700,9 @@ reduce dose,pseudo,dose
 reduce frequency,pseudo,dose
 frequency reduction,pseudo,dose
 stop,pseudo,dose
+start,pseudo,dose
+initiate,pseudo,dose
+initiation,pseudo,dose
+begin,pseudo,dose
+began,pseudo,dose
+started,pseudo,dose

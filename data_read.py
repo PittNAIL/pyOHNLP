@@ -53,9 +53,24 @@ def append_ent_data(ent, source, md, idx):
 
 def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
+    if len(doc.ents) > 0:
+        print(idx)
     results = []
     for ent in doc.ents:
         results.append(append_ent_data(ent, source, md, idx))
+    if len(doc.ents) == 0:
+        results.append({
+                "ent": "None",
+                "certainty": "NA",
+                "status": "NA",
+                "experiencer": "NA",
+                "dose_status": "NA",
+                "source": "NA",
+                "rule": "NA",
+                "offset" :"NA",
+                "version": version,
+                "index": idx,
+                } | md)
     return results
 
 
@@ -72,7 +87,7 @@ def log_shared_dtc_lengths(shared_dtc):
     while True:
         lengths = {key: len(shared_dtc[key]) for key in shared_dtc.keys()}
         logging.info(f"Lengths of shared_dtc: {lengths}")
-        time.sleep(2)  # Log every 2 seconds
+        time.sleep(10)  # Log every 2 seconds
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
