@@ -1,8 +1,9 @@
 import argparse
-import tqdm
-import json
-import pandas as pd
 import os
+import json
+import tqdm
+
+import pandas as pd
 
 from medspacy.context import ConTextRule
 from medspacy.ner import TargetRule

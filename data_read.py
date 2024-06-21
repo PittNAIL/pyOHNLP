@@ -59,7 +59,8 @@ def process_text(text, nlp, source, md, idx):
     for ent in doc.ents:
         results.append(append_ent_data(ent, source, md, idx))
     if len(doc.ents) == 0:
-        results.append({
+        results.append(
+            {
                 "ent": "None",
                 "certainty": "NA",
                 "status": "NA",
@@ -67,10 +68,12 @@ def process_text(text, nlp, source, md, idx):
                 "dose_status": "NA",
                 "source": "NA",
                 "rule": "NA",
-                "offset" :"NA",
+                "offset": "NA",
                 "version": version,
                 "index": idx,
-                } | md)
+            }
+            | md
+        )
     return results
 
 

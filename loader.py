@@ -2,7 +2,9 @@ import json
 import medspacy
 import os
 import util
+import platform
 
+import winmac.data_read as wmdr
 import pandas as pd
 
 from data_read import collect_data
@@ -20,19 +22,21 @@ CONTEXT_ATTRS = {
     "DOSE": {"dose_dec": True},
 }
 
+platform = platform.platform()
+
 
 def main():
     args = util.parse_args()
     with open(args.db_conf, "r") as f:
         conf = json.load(f)
-    util.set_extensions(CONTEXT_ATTRS)
     nlp = medspacy.load()
     nlp.remove_pipe("medspacy_context")
+    util.set_extensions(CONTEXT_ATTRS)
+
     context_rules_list = util.get_context_rules(args.context_file)
     context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
     context.add(context_rules_list)
 
-    #    rule_files = [os.path.join(args.ruleset_dir, file) for file in os.listdir(args.ruleset_dir)]
     rule_files = [
         os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
     ]
@@ -42,7 +46,10 @@ def main():
         if file.endswith(".txt"):
             target_matcher.add(util.compile_target_rules(file))
 
-    data_to_collate = collect_data(nlp)
+    if "linux" in platform.lower():
+        data_to_collate = collect_data(nlp)
+    else:
+        data_to_collate = wmdr.collect_data(nlp)
 
     df = pd.DataFrame.from_dict(data_to_collate)
     if conf["enact"] == "True":

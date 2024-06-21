@@ -8,6 +8,8 @@ import pandas as pd
 from medspacy.context import ConTextRule
 from medspacy.ner import TargetRule
 
+from spacy.tokens import Doc, Span, Token
+
 
 def parse_args() -> argparse.Namespace:
     """Parses the command line arguments."""
@@ -67,11 +69,10 @@ def compile_target_rules(rule_path):
 
 
 def set_extensions(CONTEXT_ATTRS):
-    from spacy.tokens import Doc, Span, Token
 
     Token.set_extension("concept_tag", default="", force=True)
     for _, attr_dict in CONTEXT_ATTRS.items():
-        for attr_name, attr_value in attr_dict.items():
+        for attr_name, _ in attr_dict.items():
             Span.set_extension(attr_name, default=False, force=True)
     Doc.set_extension("document_classification", default=None, force=True)
     Span.set_extension("is_template", default=False, force=True)
