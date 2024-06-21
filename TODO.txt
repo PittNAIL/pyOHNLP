@@ -20,5 +20,3 @@ Need to create a mapping for:
 Experiencer (is it the patient, a family member, other)
 Certainty (is it positive, definitely not, possible, hypothetical)
 Temporality (is it a present condition? in family history? in patient history?)
-
-

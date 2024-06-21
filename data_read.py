@@ -4,6 +4,7 @@ import psycopg2
 import multiprocessing
 import time
 import logging
+import sqlite3
 
 import pandas as pd
 
@@ -53,8 +54,6 @@ def append_ent_data(ent, source, md, idx):
 
 def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
-    if len(doc.ents) > 0:
-        print(idx)
     results = []
     for ent in doc.ents:
         results.append(append_ent_data(ent, source, md, idx))
@@ -90,7 +89,7 @@ def log_shared_dtc_lengths(shared_dtc):
     while True:
         lengths = {key: len(shared_dtc[key]) for key in shared_dtc.keys()}
         logging.info(f"Lengths of shared_dtc: {lengths}")
-        time.sleep(10)  # Log every 2 seconds
+        time.sleep(10)
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
@@ -178,43 +177,45 @@ def collect_data(nlp):
                     )
                     password = conn_details["password"]
                     connect = psycopg2.connect(database=db, user=user, host=host, password=password)
-                    table = conn_details["input_table"]
-                    text_col = conn_details["text_col"]
-                    ident = conn_details["id_col"]
-                    grab = [text_col, ident]
-                    md = conn_details["meta_data"]
-                    grab.extend(md)
-                    grab = ", ".join(grab)
-                    cursor = connect.cursor()
-                    cursor.execute(f"select {grab} from {table} limit 15")
+                if db_used == "sqlite":
+                    connect = sqlite3.connect(database=db)
+                table = conn_details["input_table"]
+                text_col = conn_details["text_col"]
+                ident = conn_details["id_col"]
+                grab = [text_col, ident]
+                md = conn_details["meta_data"]
+                grab.extend(md)
+                grab = ", ".join(grab)
+                cursor = connect.cursor()
+                cursor.execute(f"select {grab} from {table} limit 15")
 
-                    with multiprocessing.Pool(num_processes) as pool:
-                        while True:
-                            records = cursor.fetchmany(batch_size)
-                            if not records:
-                                break
-                            pool.map(
-                                process_records,
-                                [
-                                    (
-                                        record[0],
-                                        table,
-                                        nlp,
-                                        shared_dtc,
-                                        {md[i]: record[i + 2] for i in range(len(md))},
-                                        record[1],
-                                    )
-                                    for record in records
-                                ],
-                            )
+                with multiprocessing.Pool(num_processes) as pool:
+                    while True:
+                        records = cursor.fetchmany(batch_size)
+                        if not records:
+                            break
+                        pool.map(
+                            process_records,
+                            [
+                                (
+                                    record[0],
+                                    table,
+                                    nlp,
+                                    shared_dtc,
+                                    {md[i]: record[i + 2] for i in range(len(md))},
+                                    record[1],
+                                )
+                                for record in records
+                            ],
+                        )
 
-                    connect.close()
-                    data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
+                connect.close()
+                data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
-                if db_used != "postgresql":
-                    raise ValueError(
-                        f"Database type {db_used} not supported! Please consider using postgresql if you'd like to read or write to database"
-                    )
+            if (db_used != "postgresql") & (db_used != "sqlite"):
+                raise ValueError(
+                    f"Database type {db_used} not supported! Please consider using postgresql if you'd like to read or write to database"
+                )
 
     logger_process.terminate()
 

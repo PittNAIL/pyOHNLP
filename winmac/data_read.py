@@ -4,6 +4,7 @@ import psycopg2
 import multiprocessing
 import pandas as pd
 import medspacy
+import sqlite3
 
 from util import parse_args, set_extensions, compile_target_rules, get_context_rules, get_versioning
 
@@ -182,36 +183,38 @@ def collect_data(nlp):
                     )
                     password = conn_details["password"]
                     connect = psycopg2.connect(database=db, user=user, host=host, password=password)
-                    table = conn_details["input_table"]
-                    text_col = conn_details["text_col"]
-                    ident = conn_details["id_col"]
-                    grab = [text_col, ident]
-                    md = conn_details["meta_data"]
-                    grab.extend(md)
-                    grab = ", ".join(grab)
-                    cursor = connect.cursor()
-                    cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
+                if db_used == "sqlite":
+                    connect = sqlite3.connect(database=db)
+                table = conn_details["input_table"]
+                text_col = conn_details["text_col"]
+                ident = conn_details["id_col"]
+                grab = [text_col, ident]
+                md = conn_details["meta_data"]
+                grab.extend(md)
+                grab = ", ".join(grab)
+                cursor = connect.cursor()
+                cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
 
-                    while True:
-                        records = cursor.fetchmany(batch_size)
-                        if not records:
-                            break
-                        pool = multiprocessing.Pool(processes=num_processes)
-                        pool.map(
-                            process_records,
-                            [
-                                (
-                                    record[0],
-                                    table,
-                                    nlp,
-                                    shared_dtc,
-                                    {md[i]: record[i + 2] for i in range(len(md))},
-                                    record[1],
-                                )
-                                for record in records
-                            ],
-                        )
+                while True:
+                    records = cursor.fetchmany(batch_size)
+                    if not records:
+                        break
+                    pool = multiprocessing.Pool(processes=num_processes)
+                    pool.map(
+                        process_records,
+                        [
+                            (
+                                record[0],
+                                table,
+                                nlp,
+                                shared_dtc,
+                                {md[i]: record[i + 2] for i in range(len(md))},
+                                record[1],
+                            )
+                            for record in records
+                        ],
+                    )
 
-                    connect.close()
+                connect.close()
 
     return {key: list(value) for key, value in shared_dtc.items()}

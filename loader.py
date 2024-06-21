@@ -8,8 +8,8 @@ import winmac.data_read as wmdr
 import pandas as pd
 
 from data_read import collect_data
-from dbwriter import write_to_db
 from enact_module import enact_transform
+from write_to_db import dbwriter
 
 CONTEXT_ATTRS = {
     "NEG": {"is_negated": True},
@@ -58,7 +58,7 @@ def main():
     if conf["write_to"]["to_csv"] == "True":
         df.to_csv("medspacy_results_sample.csv", index=False)
     if conf["write_to"]["to_table"] != "None":
-        write_to_db(df, args.db_conf)
+        dbwriter(df, args.db_conf)
 
 
 if __name__ == "__main__":

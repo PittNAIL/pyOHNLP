@@ -105,8 +105,8 @@ def get_versioning(software, config):
             rule_version = json.load(f)
     else:
         rule_version = {"Version": "Not given"}
-    meditag_version = mt_versions["MediTag"]
+    pyohnlp_version = mt_versions["pyOHNLP Toolkit"]
     context_version = mt_versions["ConText"]
     ruleset_version = list(rule_version.items())[0]
-    versioning = f"MediTag:{meditag_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
+    versioning = f"pyOHNLP:{pyohnlp_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
     return versioning

@@ -1,5 +1,6 @@
 import json
 import psycopg2
+import sqlite3
 
 from io import StringIO
 
@@ -11,7 +12,7 @@ with open(args.db_conf, "r") as f:
     config = json.load(f)
 
 
-def write_to_db(dataframe, config_path):
+def dbwriter(dataframe, config_path):
     columns = list(dataframe.columns)
     output = StringIO()
     dataframe.to_csv(output, index=False, header=True)
@@ -35,12 +36,12 @@ def write_to_db(dataframe, config_path):
     table = db_config["to_table"]
     if config["db_type"] == "postgresql":
         connect = psycopg2.connect(database=db, user=user, host=host, password=password)
-        cursor = connect.cursor()
-        cursor.copy_expert(
-            f"COPY {table} ({', '.join(columns)}) FROM STDIN WITH CSV HEADER", output
-        )
-        connect.commit()
-        cursor.close()
-        connect.close()
-    if config["db_type"] != "postgresql":
-        raise ValueError("Only postgresql supported at the moment.")
+    if config["db_type"] == "sqlite":
+        connect = sqlite3.connect(database=db)
+    cursor = connect.cursor()
+    cursor.copy_expert(f"COPY {table} ({', '.join(columns)}) FROM STDIN WITH CSV HEADER", output)
+    connect.commit()
+    cursor.close()
+    connect.close()
+    if (config["db_type"] != "postgresql") & (config["db_type"] != "sqlite"):
+        raise ValueError("Only postgresql and sqlite supported at the moment.")
