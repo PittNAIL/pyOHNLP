@@ -58,14 +58,14 @@ def process_text(text, nlp, source, md, idx):
     if len(doc.ents) == 0:
         results.append(
             {
-                "ent": "None",
-                "certainty": "NA",
-                "status": "NA",
-                "experiencer": "NA",
-                "dose_status": "NA",
-                "source": "NA",
-                "rule": "NA",
-                "offset": "NA",
+                "ent": "no entities found",
+                "certainty": "not found",
+                "status": "not found",
+                "experiencer": "not found",
+                "dose_status": "not found",
+                "source": "not found",
+                "rule": "not found",
+                "offset": "not found",
                 "version": version,
                 "index": idx,
             }
