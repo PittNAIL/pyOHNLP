@@ -37,7 +37,8 @@ def append_ent_data(ent, source, md:None, idx):
         status = "Other History"
     else:
         status = "Present"
-    return {
+    if md is not None:
+        return {
         "ent": str(ent),
         "certainty": certainty,
         "status": status,
@@ -49,6 +50,19 @@ def append_ent_data(ent, source, md:None, idx):
         "version": version,
         "index": idx,
         } | md
+    if md is None:
+        return {
+        "ent": str(ent),
+        "certainty": certainty,
+        "status": status,
+        "experiencer": experiencer,
+        "dose_status": ent._.dose_dec,
+        "source": source,
+        "rule": str(ent._.literal),
+        "offset": ent.start_char,
+        "version": version,
+        "index": idx,
+        }
 
 def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
@@ -56,7 +70,8 @@ def process_text(text, nlp, source, md, idx):
     for ent in doc.ents:
         results.append(append_ent_data(ent, source, md, idx))
     if len(doc.ents) == 0:
-        results.append(
+        if md is not None:
+            results.append(
             {
                 "ent": "no entities found",
                 "certainty": "not found",
@@ -71,6 +86,21 @@ def process_text(text, nlp, source, md, idx):
             }
             | md
         )
+        else:
+            results.append(
+            {
+                "ent": "no entities found",
+                "certainty": "not found",
+                "status": "not found",
+                "experiencer": "not found",
+                "dose_status": "not found",
+                "source": "not found",
+                "rule": "not found",
+                "offset": "not found",
+                "version": version,
+                "index": idx,
+            })
+
     return results
 
 
@@ -99,6 +129,8 @@ def collect_data(nlp):
         config = json.load(f)
 
     row_to_read, metadata = config["read_from"]["text_col"], config["read_from"]["meta_data"]
+    if metadata == ["NONE"]:
+        metadata = None
 
     data_to_collate = {
         "ent": [],
@@ -132,7 +164,7 @@ def collect_data(nlp):
             for file in os.listdir(args.file_path):
                 with open(os.path.join(args.file_path, file), "r") as f:
                     txt = f.read()
-                texts.append((txt, file, nlp, shared_dtc))
+                texts.append((txt, file, nlp, shared_dtc, None, file))
             pool = multiprocessing.Pool(processes=num_processes)
             pool.map(process_records, texts)
             data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
@@ -142,7 +174,7 @@ def collect_data(nlp):
                 chunk_size = 1000
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
                     note_text = [
-                        (row[row_to_read], {md: row[md] for md in metadata}, idx)
+                        (row[row_to_read], {md: row[md] for md in metadata} if metadata else None, idx)
                         for idx, row in chunk.iterrows()
                     ]
                     args_list = [
@@ -182,10 +214,14 @@ def collect_data(nlp):
                 ident = conn_details["id_col"]
                 grab = [text_col, ident]
                 md = conn_details["meta_data"]
-                grab.extend(md)
-                grab = ", ".join(grab)
+                if md == ["NONE"]:
+                    md = None
+                    grab = ", ".join(grab)
+                else:
+                    grab.extend(md)
+                    grab = ", ".join(grab)
                 cursor = connect.cursor()
-                cursor.execute(f"select {grab} from {table} limit 15")
+                cursor.execute(f"select {grab} from {table} limit 5")
 
                 with multiprocessing.Pool(num_processes) as pool:
                     while True:
@@ -200,7 +236,7 @@ def collect_data(nlp):
                                     table,
                                     nlp,
                                     shared_dtc,
-                                    {md[i]: record[i + 2] for i in range(len(md))},
+                                    {md[i]: record[i + 2] for i in range(len(md))} if md else None,
                                     record[1],
                                 )
                                 for record in records

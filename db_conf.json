@@ -7,7 +7,7 @@
     "input_table": "raw.meta",
     "text_col": "NOTE_TEXT",
     "id_col": "NOTE_ID",
-    "meta_data": ["CONTACT_DATE", "VISIT_ID", "STUDY_ID"]
+    "meta_data": ["NONE"]
     },
 "write_to" : {
     "db_type": "postgresql",
@@ -18,7 +18,7 @@
     "to_table": "raw.bg_data",
     "to_csv":"True"
 },
-"ruleset_dir": "/home/jordan/wip/RULESETS/capecitabine_rules_v2",
+"ruleset_dir": "/home/jordan/MedTagger/resources/sleep_rules/regexp",
 "enact":"False"
 }
 
