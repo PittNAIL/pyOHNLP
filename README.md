@@ -62,7 +62,7 @@ python loader.py --db_conf <PATH TO DB CONFIG>
 Compatibility with .zip files has yet to be added, as well as writing to/from mysql databases.
 
 # Implementation
-MediTag has been implemented by [Jordan Hilsman][jordan] from [PittNail][pn] at the [University of Pittsburgh][pitt].
+pyOHNLP has been implemented by [Jordan Hilsman][jordan] from [PittNail][pn] at the [University of Pittsburgh][pitt].
 
 [medspacy]: https://github.com/medspacy/medspacy
 [jordan]: https://jordanhilsman.github.io
