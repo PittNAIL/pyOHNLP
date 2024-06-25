@@ -5,7 +5,7 @@
     "password": "jorzac99",
     "host": "127.0.0.1",
     "input_table": "raw.meta",
-    "text_col": "NOTE_TEXT",
+    "text_col": "Note Sample",
     "id_col": "NOTE_ID",
     "meta_data": ["NONE"]
     },
@@ -18,7 +18,7 @@
     "to_table": "raw.bg_data",
     "to_csv":"True"
 },
-"ruleset_dir": "/home/jordan/MedTagger/resources/sleep_rules/regexp",
+"ruleset_dir": "/home/jordan/git/OHNLPTK_SETUP/OHNLPTK/resources/sleep_mod/regexp",
 "enact":"False"
 }
 

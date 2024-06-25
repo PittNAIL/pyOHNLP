@@ -1,12 +1,14 @@
 import json
+import logging
+import time
 import os
 import psycopg2
 import multiprocessing
 import pandas as pd
-import medspacy
 import sqlite3
 
-from util import parse_args, set_extensions, compile_target_rules, get_context_rules, get_versioning
+from winmac.util import parse_args, set_extensions, get_versioning
+from winmac.util import quiet_fix
 
 CONTEXT_ATTRS = {
     "NEG": {"is_negated": True},
@@ -30,7 +32,7 @@ num_processes = multiprocessing.cpu_count()
 version = get_versioning("versions.json", args.db_conf)
 
 
-def append_ent_data(ent, source, md, idx):
+def append_ent_data(ent, source, md:None, idx):
     if ent._.is_negated:
         certainty = "Negated"
     elif ent._.is_possible:
@@ -49,7 +51,8 @@ def append_ent_data(ent, source, md, idx):
         status = "Other History"
     else:
         status = "Present"
-    return {
+    if md is not None:
+        return {
         "ent": str(ent),
         "certainty": certainty,
         "status": status,
@@ -60,7 +63,20 @@ def append_ent_data(ent, source, md, idx):
         "offset": ent.start_char,
         "version": version,
         "index": idx,
-    } | md
+        } | md
+    else:
+        return {
+        "ent": str(ent),
+        "certainty": certainty,
+        "status": status,
+        "experiencer": experiencer,
+        "dose_status": ent._.dose_exp,
+        "source": source,
+        "rule": str(ent._.literal),
+        "offset": ent.start_char,
+        "version": version,
+        "index": idx,
+        }
 
 
 def process_text(text, nlp, source, md, idx):
@@ -68,11 +84,42 @@ def process_text(text, nlp, source, md, idx):
     results = []
     for ent in doc.ents:
         results.append(append_ent_data(ent, source, md, idx))
+    if len(doc.ents) == 0:
+        if md is not None:
+            results.append(
+            {
+                "ent": "no entities found",
+                "certainty": "not found",
+                "status": "not found",
+                "experiencer": "not found",
+                "dose_status": "not found",
+                "source": "not found",
+                "rule": "not found",
+                "offset": "not found",
+                "version": version,
+                "index": idx,
+            }
+            | md
+        )
+        else:
+            results.append(
+            {
+                "ent": "no entities found",
+                "certainty": "not found",
+                "status": "not found",
+                "experiencer": "not found",
+                "dose_status": "not found",
+                "source": "not found",
+                "rule": "not found",
+                "offset": "not found",
+                "version": version,
+                "index": idx,
+            })
     return results
 
 
 def process_records(args):
-    fixit()
+    quiet_fix()
     text, source, nlp, shared_dtc, md, idx = args
     results = process_text(text, nlp, source, md, idx)
     for result in results:
@@ -80,41 +127,19 @@ def process_records(args):
             for key in shared_dtc.keys():
                 shared_dtc[key].append(result[key])
 
-
-def fixit():
-    args = parse_args()
-    with open(args.db_conf, "r") as f:
-        conf = json.load(f)
-    nlp = medspacy.load()
-    nlp.remove_pipe("medspacy_context")
-    CONTEXT_ATTRS = {
-        "NEG": {"is_negated": True},
-        "POSS": {"is_possible": True},
-        "HYPO": {"is_hypothetical": True},
-        "HIST": {"is_historical": True},
-        "EXP_FAMILY": {"fam_experiencer": True},
-        "HISTEXP": {"hist_experienced": True},
-        "HYPOEXP": {"hypo_experienced": True},
-        "DOSE": {"dose_exp": True},
-    }
-    set_extensions(CONTEXT_ATTRS)
-    context_rules_list = get_context_rules(args.context_file)
-    context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
-    context.add(context_rules_list)
-
-    rule_files = [
-        os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
-    ]
-    target_matcher = nlp.get_pipe("medspacy_target_matcher")
-    for file in rule_files:
-        target_matcher.add(compile_target_rules(file))
-
+def log_shared_dtc_lengths(shared_dtc):
+    while True:
+        lengths = {key: len(shared_dtc[key]) for key in shared_dtc.keys()}
+        logging.info(f"Lengths of shared_dtc: {lengths}")
+        time.sleep(10)
 
 def collect_data(nlp):
     with open(args.db_conf, "r") as f:
         config = json.load(f)
 
     row_to_read, metadata = config["read_from"]["text_col"], config["read_from"]["meta_data"]
+    if metadata == ["NONE"]:
+        metadata = None
 
     data_to_collate = {
         "ent": [],
@@ -154,7 +179,7 @@ def collect_data(nlp):
                 chunk_size = 100
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
                     note_text = [
-                        (row[row_to_read], {md: row[md] for md in metadata}, idx)
+                        (row[row_to_read], {md: row[md] for md in metadata} if metadata else None, idx)
                         for idx, row in chunk.iterrows()
                     ]
                     args_list = [
@@ -190,8 +215,12 @@ def collect_data(nlp):
                 ident = conn_details["id_col"]
                 grab = [text_col, ident]
                 md = conn_details["meta_data"]
-                grab.extend(md)
-                grab = ", ".join(grab)
+                if md == ["NONE"]:
+                    md = None
+                    grab = ", ".join(grab)
+                else:
+                    grab.extend(md)
+                    grab = ", ".join(grab)
                 cursor = connect.cursor()
                 cursor.execute(f"select {text_col}, {ident} from {table} limit 1500")
 

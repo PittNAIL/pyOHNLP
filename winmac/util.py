@@ -2,6 +2,7 @@ import argparse
 import os
 import json
 import tqdm
+import medspacy
 
 import pandas as pd
 
@@ -52,6 +53,29 @@ def get_context_rules(CONTEXT_FILE):
         )
     return context_rules_list
 
+def quiet_get_context_rules(CONTEXT_FILE):
+    context_rules_list = []
+    df = pd.read_csv(CONTEXT_FILE)
+    for _, row in df.iterrows():
+        context_rules_list.append(
+            ConTextRule(
+                literal=row["literal"], direction=row["direction"], category=row["category"]
+            )
+        )
+    return context_rules_list
+
+def quiet_compile_target_rules(rule_path):
+    with open(rule_path, "r") as f:
+        rules = f.readlines()
+    target_rules = []
+    for line in rules:
+        rule = line.strip()
+        if "_re" in rule_path:
+            rulename = rule_path.split("_re")[-1].split(".txt")[0]
+        elif "/" in rule_path:
+            rulename = rule_path.split("/")[-1].split(".txt")[0]
+        target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rule}"))
+    return target_rules
 
 def compile_target_rules(rule_path):
     print(f"Getting matcher rules from {rule_path}")
@@ -104,8 +128,66 @@ def get_versioning(software, config):
             rule_version = json.load(f)
     else:
         rule_version = {"Version": "Not given"}
-    meditag_version = mt_versions["MediTag"]
+    pyohnlp_version = mt_versions["pyOHNLP Toolkit"]
     context_version = mt_versions["ConText"]
     ruleset_version = list(rule_version.items())[0]
-    versioning = f"MediTag:{meditag_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
+    versioning = f"MediTag:{pyohnlp_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
     return versioning
+
+def fixit():
+    args = parse_args()
+    with open(args.db_conf, "r") as f:
+        conf = json.load(f)
+    nlp = medspacy.load()
+    nlp.remove_pipe("medspacy_context")
+    CONTEXT_ATTRS = {
+        "NEG": {"is_negated": True},
+        "POSS": {"is_possible": True},
+        "HYPO": {"is_hypothetical": True},
+        "HIST": {"is_historical": True},
+        "EXP_FAMILY": {"fam_experiencer": True},
+        "HISTEXP": {"hist_experienced": True},
+        "HYPOEXP": {"hypo_experienced": True},
+        "DOSE": {"dose_exp": True},
+    }
+    set_extensions(CONTEXT_ATTRS)
+    context_rules_list = get_context_rules(args.context_file)
+    context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
+    context.add(context_rules_list)
+
+    rule_files = [
+        os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
+    ]
+    target_matcher = nlp.get_pipe("medspacy_target_matcher")
+    for file in rule_files:
+        target_matcher.add(compile_target_rules(file))
+
+def quiet_fix():
+    args = parse_args()
+    with open(args.db_conf, "r") as f:
+        conf = json.load(f)
+    nlp = medspacy.load()
+    nlp.remove_pipe("medspacy_context")
+    CONTEXT_ATTRS = {
+        "NEG": {"is_negated": True},
+        "POSS": {"is_possible": True},
+        "HYPO": {"is_hypothetical": True},
+        "HIST": {"is_historical": True},
+        "EXP_FAMILY": {"fam_experiencer": True},
+        "HISTEXP": {"hist_experienced": True},
+        "HYPOEXP": {"hypo_experienced": True},
+        "DOSE": {"dose_exp": True},
+    }
+    set_extensions(CONTEXT_ATTRS)
+    context_rules_list = quiet_get_context_rules(args.context_file)
+    context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
+    context.add(context_rules_list)
+
+    rule_files = [
+        os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
+    ]
+    target_matcher = nlp.get_pipe("medspacy_target_matcher")
+    for file in rule_files:
+        target_matcher.add(quiet_compile_target_rules(file))
+
+

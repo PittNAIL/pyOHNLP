@@ -25,15 +25,13 @@ def dbwriter(dataframe, config_path):
     if db_type != "postgresql":
         raise ValueError("Only postgresql supported at the moment.")
 
-    db_config = config[db_type]
-
     db, user, host, password = (
-        db_config["database"],
-        db_config["user"],
-        db_config["host"],
-        db_config["password"],
+        config["database"],
+        config["user"],
+        config["host"],
+        config["password"],
     )
-    table = db_config["to_table"]
+    table = config["to_table"]
     if config["db_type"] == "postgresql":
         connect = psycopg2.connect(database=db, user=user, host=host, password=password)
     if config["db_type"] == "sqlite":
