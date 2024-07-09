@@ -6,7 +6,7 @@ SQLite)
 
 <p align=center>
     <img src="https://img.shields.io/badge/build-Complete-blue" alt="Build Status">
-    <img src="https://img.shields.io/badge/Version-1.15-green" alt="Version">
+    <img src="https://img.shields.io/badge/Version-1.16-green" alt="Version">
     <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
 
