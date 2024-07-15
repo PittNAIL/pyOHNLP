@@ -104,8 +104,11 @@ def get_versioning(software, config=None):
         if "VERSION.json" in os.listdir(ruleset_dir):
             with open(os.path.join(ruleset_dir, "VERSION.json"), "r") as f:
                 rule_version = json.load(f)
+        else:
+            rule_version = {"Version": "Not given"}
     else:
-        rule_version = {"Version": "Not given"}
+        rule_version = {"Version": "NA"}
+
     pyohnlp_version = mt_versions["pyOHNLP Toolkit"]
     context_version = mt_versions["ConText"]
     ruleset_version = list(rule_version.items())[0]

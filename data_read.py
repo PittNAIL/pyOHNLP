@@ -18,7 +18,8 @@ num_processes = multiprocessing.cpu_count()
 
 version = get_versioning("versions.json", args.db_conf)
 
-def append_ent_data(ent, source, md:None, idx):
+
+def append_ent_data(ent, source, md: None, idx):
     if ent._.is_negated:
         certainty = "Negated"
     elif ent._.is_possible:
@@ -39,30 +40,31 @@ def append_ent_data(ent, source, md:None, idx):
         status = "Present"
     if md is not None:
         return {
-        "ent": str(ent),
-        "certainty": certainty,
-        "status": status,
-        "experiencer": experiencer,
-        "dose_status": ent._.dose_dec,
-        "source": source,
-        "rule": str(ent._.literal),
-        "offset": ent.start_char,
-        "version": version,
-        "index": idx,
+            "ent": str(ent),
+            "certainty": certainty,
+            "status": status,
+            "experiencer": experiencer,
+            "dose_status": ent._.dose_dec,
+            "source": source,
+            "rule": str(ent._.literal),
+            "offset": ent.start_char,
+            "version": version,
+            "index": idx,
         } | md
     if md is None:
         return {
-        "ent": str(ent),
-        "certainty": certainty,
-        "status": status,
-        "experiencer": experiencer,
-        "dose_status": ent._.dose_dec,
-        "source": source,
-        "rule": str(ent._.literal),
-        "offset": ent.start_char,
-        "version": version,
-        "index": idx,
+            "ent": str(ent),
+            "certainty": certainty,
+            "status": status,
+            "experiencer": experiencer,
+            "dose_status": ent._.dose_dec,
+            "source": source,
+            "rule": str(ent._.literal),
+            "offset": ent.start_char,
+            "version": version,
+            "index": idx,
         }
+
 
 def process_text(text, nlp, source, md, idx):
     doc = nlp(text)
@@ -72,34 +74,35 @@ def process_text(text, nlp, source, md, idx):
     if len(doc.ents) == 0:
         if md is not None:
             results.append(
-            {
-                "ent": "no entities found",
-                "certainty": "not found",
-                "status": "not found",
-                "experiencer": "not found",
-                "dose_status": "not found",
-                "source": "not found",
-                "rule": "not found",
-                "offset": "not found",
-                "version": version,
-                "index": idx,
-            }
-            | md
-        )
+                {
+                    "ent": "no entities found",
+                    "certainty": "not found",
+                    "status": "not found",
+                    "experiencer": "not found",
+                    "dose_status": "not found",
+                    "source": "not found",
+                    "rule": "not found",
+                    "offset": "not found",
+                    "version": version,
+                    "index": idx,
+                }
+                | md
+            )
         else:
             results.append(
-            {
-                "ent": "no entities found",
-                "certainty": "not found",
-                "status": "not found",
-                "experiencer": "not found",
-                "dose_status": "not found",
-                "source": "not found",
-                "rule": "not found",
-                "offset": "not found",
-                "version": version,
-                "index": idx,
-            })
+                {
+                    "ent": "no entities found",
+                    "certainty": "not found",
+                    "status": "not found",
+                    "experiencer": "not found",
+                    "dose_status": "not found",
+                    "source": "not found",
+                    "rule": "not found",
+                    "offset": "not found",
+                    "version": version,
+                    "index": idx,
+                }
+            )
 
     return results
 
@@ -174,7 +177,11 @@ def collect_data(nlp):
                 chunk_size = 1000
                 for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
                     note_text = [
-                        (row[row_to_read], {md: row[md] for md in metadata} if metadata else None, idx)
+                        (
+                            row[row_to_read],
+                            {md: row[md] for md in metadata} if metadata else None,
+                            idx,
+                        )
                         for idx, row in chunk.iterrows()
                     ]
                     args_list = [

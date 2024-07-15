@@ -53,6 +53,7 @@ def get_context_rules(CONTEXT_FILE):
         )
     return context_rules_list
 
+
 def quiet_get_context_rules(CONTEXT_FILE):
     context_rules_list = []
     df = pd.read_csv(CONTEXT_FILE)
@@ -63,6 +64,7 @@ def quiet_get_context_rules(CONTEXT_FILE):
             )
         )
     return context_rules_list
+
 
 def quiet_compile_target_rules(rule_path):
     with open(rule_path, "r") as f:
@@ -76,6 +78,7 @@ def quiet_compile_target_rules(rule_path):
             rulename = rule_path.split("/")[-1].split(".txt")[0]
         target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rule}"))
     return target_rules
+
 
 def compile_target_rules(rule_path):
     print(f"Getting matcher rules from {rule_path}")
@@ -134,6 +137,7 @@ def get_versioning(software, config):
     versioning = f"MediTag:{pyohnlp_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
     return versioning
 
+
 def fixit():
     args = parse_args()
     with open(args.db_conf, "r") as f:
@@ -162,6 +166,7 @@ def fixit():
     for file in rule_files:
         target_matcher.add(compile_target_rules(file))
 
+
 def quiet_fix():
     args = parse_args()
     with open(args.db_conf, "r") as f:
@@ -189,5 +194,3 @@ def quiet_fix():
     target_matcher = nlp.get_pipe("medspacy_target_matcher")
     for file in rule_files:
         target_matcher.add(quiet_compile_target_rules(file))
-
-

@@ -3,6 +3,8 @@ import medspacy
 import os
 import util
 import platform
+import time
+import datetime
 
 import winmac.data_read as wmdr
 import pandas as pd
@@ -54,9 +56,9 @@ def main():
     df = pd.DataFrame.from_dict(data_to_collate)
     if conf["enact"] == "True":
         df = enact_transform(df)
-
+    timestamp = datetime.datetime.fromtimestamp(time.time())
     if conf["write_to"]["to_csv"] == "True":
-        df.to_csv("medspacy_results_sample.csv", index=False)
+        df.to_csv("./pyOHNLP_output_{timestamp}.csv", index=False)
     if conf["write_to"]["to_table"] != "None":
         dbwriter(df, args.db_conf)
 

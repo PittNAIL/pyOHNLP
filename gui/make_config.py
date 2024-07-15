@@ -1,8 +1,8 @@
 import tkinter as tk
 import json
 import os
-from tkinter import filedialog
 from tkinter import ttk
+
 
 def create_config(root):
     def handle_click(event):
@@ -13,20 +13,18 @@ def create_config(root):
                 "user": user_entry.get(),
                 "password": pass_entry.get(),
                 "host": host_entry.get(),
+                "input_table": input_table_entry.get(),
                 "text_col": text_entry.get(),
                 "id_col": id_entry.get(),
-                "metadata": metadata_entry.get()
+                "meta_data": [metadata_entry.get()],
             }
         }
 
-        with open('example.json', 'w') as f:
-            json.dump(read_from, f)
-
-        print("Config data written to example.json")
+        for widget in root.winfo_children():
+            widget.destroy()
         create_write_to(root, read_from)
 
-
-    window = tk.Toplevel(root)
+    window = root
     window.title("Create Config")
 
     read_from = tk.Label(window, text="Read From Info:")
@@ -40,6 +38,8 @@ def create_config(root):
     pass_entry = tk.Entry(window)
     host_label = tk.Label(window, text="Host:")
     host_entry = tk.Entry(window)
+    input_table_label = tk.Label(window, text="Input Table:")
+    input_table_entry = tk.Entry(window)
     text_label = tk.Label(window, text="Text Column:")
     text_entry = tk.Entry(window)
     id_label = tk.Label(window, text="ID Column:")
@@ -61,6 +61,8 @@ def create_config(root):
     pass_entry.pack()
     host_label.pack()
     host_entry.pack()
+    input_table_label.pack()
+    input_table_entry.pack()
     text_label.pack()
     text_entry.pack()
     id_label.pack()
@@ -79,26 +81,29 @@ def create_write_to(root, data):
                 "user": user_entry.get(),
                 "password": pass_entry.get(),
                 "host": host_entry.get(),
-                "text_col": text_entry.get(),
-                "id_col": id_entry.get(),
-                "metadata": metadata_entry.get()
+                "to_table": to_table_entry.get(),
+                "to_csv": to_csv_entry.get(),
             },
-            "ruleset_dir" : f"../RULESETS/{ruleset_combobox.get()}"
+            "ruleset_dir": f"./RULESETS/{ruleset_combobox.get()}",
+            "enact": enact_option_entry.get(),
         }
 
-        with open('example.json', 'w') as f:
+        with open("user_conf.json", "w") as f:
             json.dump(data | write_to, f)
 
-        print("Config data written to example.json")
+        print("Config data written to user_conf.json")
+        root.quit()
 
     def update_options(event=None):
-        folder_path = "../RULESETS"
+        folder_path = "./RULESETS"
         if os.path.isdir(folder_path):
-            folders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
-            ruleset_combobox['values'] = folders
+            folders = [
+                f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))
+            ]
+            ruleset_combobox["values"] = folders
             ruleset_combobox.set("")
 
-    window = tk.Toplevel(root)
+    window = root
     window.title("Create Config")
 
     read_from = tk.Label(window, text="Write to Info:")
@@ -112,17 +117,15 @@ def create_write_to(root, data):
     pass_entry = tk.Entry(window)
     host_label = tk.Label(window, text="Host:")
     host_entry = tk.Entry(window)
-    text_label = tk.Label(window, text="Text Column:")
-    text_entry = tk.Entry(window)
-    id_label = tk.Label(window, text="ID Column:")
-    id_entry = tk.Entry(window)
-    metadata_label = tk.Label(window, text="Metadata Columns:")
-    metadata_entry = tk.Entry(window)
+    to_table_label = tk.Label(window, text="To Table:")
+    to_table_entry = tk.Entry(window)
+    to_csv_label = tk.Label(window, text="To CSV:")
+    to_csv_entry = tk.Entry(window)
     ruleset_dir_label = tk.Label(window, text="Ruleset Directory:")
-    enact_option_label = tk.Label(window, text="Enact Output:")
-    enact_option_entry=tk.Entry(window)
+    enact_option_label = tk.Label(window, text="Enact Output Transformation:")
+    enact_option_entry = tk.Entry(window)
 
-    ruleset_combobox = ttk.Combobox(window, state='readonly')
+    ruleset_combobox = ttk.Combobox(window, state="readonly")
     browse_button = tk.Button(window, text="Refresh", command=update_options)
 
     button = tk.Button(window, text="Save")
@@ -139,16 +142,13 @@ def create_write_to(root, data):
     pass_entry.pack()
     host_label.pack()
     host_entry.pack()
-    text_label.pack()
-    text_entry.pack()
-    id_label.pack()
-    id_entry.pack()
-    metadata_label.pack()
-    metadata_entry.pack()
+    to_table_label.pack()
+    to_table_entry.pack()
+    to_csv_label.pack()
+    to_csv_entry.pack()
     ruleset_dir_label.pack()
     ruleset_combobox.pack()
     enact_option_label.pack()
     enact_option_entry.pack()
     browse_button.pack()
     button.pack()
-
