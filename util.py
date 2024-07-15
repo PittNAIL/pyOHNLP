@@ -94,15 +94,16 @@ def get_literal(span):
     return literal
 
 
-def get_versioning(software, config):
+def get_versioning(software, config=None):
     with open(software, "r") as f:
         mt_versions = json.load(f)
-    with open(config, "r") as f:
-        conf = json.load(f)
-    ruleset_dir = conf["ruleset_dir"]
-    if "VERSION.json" in os.listdir(ruleset_dir):
-        with open(os.path.join(ruleset_dir, "VERSION.json"), "r") as f:
-            rule_version = json.load(f)
+    if config is not None:
+        with open(config, "r") as f:
+            conf = json.load(f)
+        ruleset_dir = conf["ruleset_dir"]
+        if "VERSION.json" in os.listdir(ruleset_dir):
+            with open(os.path.join(ruleset_dir, "VERSION.json"), "r") as f:
+                rule_version = json.load(f)
     else:
         rule_version = {"Version": "Not given"}
     pyohnlp_version = mt_versions["pyOHNLP Toolkit"]
