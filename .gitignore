@@ -213,5 +213,9 @@ tags
 #.json
 *.json
 
+#RULESETS
+./RULESETS/
+
+
 # End of https://www.toptal.com/developers/gitignore/api/python,linux,vim
 
