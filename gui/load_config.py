@@ -1,6 +1,7 @@
 from tkinter import filedialog
 import json
 
+#TODO: Edit loaded config
 
 def open_directory():
     directory = filedialog.askdirectory()

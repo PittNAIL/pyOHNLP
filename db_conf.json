@@ -5,9 +5,9 @@
     "password": "jorzac99",
     "host": "127.0.0.1",
     "input_table": "raw.meta",
-    "text_col": "note_text",
-    "id_col": "encounter_notes_pk",
-    "meta_data": ["encounter_notes_pk"]
+    "text_col": "NOTE_TEXT",
+    "id_col": "NOTE_ID",
+    "meta_data": ["STUDY_ID"]
     },
 "write_to" : {
     "db_type": "postgresql",
@@ -18,7 +18,7 @@
     "to_table": "raw.bg_data",
     "to_csv":"True"
 },
-"ruleset_dir": "/home/jordan/Downloads/eval_files/housing_ruleset/regexp",
+"ruleset_dir": "/home/jordan/git/pyOHNLP/RULESETS/capecitabine_rules_v3/",
 "enact":"False"
 }
 

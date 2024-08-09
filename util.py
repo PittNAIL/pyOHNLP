@@ -1,6 +1,9 @@
 import argparse
+import datetime
 import os
 import json
+import re
+import time
 import tqdm
 
 import pandas as pd
@@ -52,19 +55,29 @@ def get_context_rules(CONTEXT_FILE):
         )
     return context_rules_list
 
+def compile_regexp(file_lines):
+    patterns = []
+    for line in file_lines:
+        line = line.strip()
+        if not line:
+            continue
+        if re.search(r'[.*+?^${}()|[\]\\]', line):
+            patterns.append(f"({line})")
+        else:
+            esc = re.escape(line)
+            patterns.append(f"({esc})")
+    combined_patterns = '|'.join(patterns)
+    return combined_patterns
+
 
 def compile_target_rules(rule_path):
     print(f"Getting matcher rules from {rule_path}")
-    with open(rule_path, "r") as f:
-        rules = f.readlines()
     target_rules = []
-    for line in rules:
-        rule = line.strip()
-        if "_re" in rule_path:
-            rulename = rule_path.split("_re")[-1].split(".txt")[0]
-        elif "/" in rule_path:
-            rulename = rule_path.split("/")[-1].split(".txt")[0]
-        target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rule}"))
+    with open(rule_path, 'r') as f:
+        rulez = f.read().splitlines()
+    rules_pattern = compile_regexp(rulez)
+    rulename = rule_path.split("_")[-1].split('.txt')[0]
+    target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rules_pattern}"))
     return target_rules
 
 
@@ -114,3 +127,11 @@ def get_versioning(software, config=None):
     ruleset_version = list(rule_version.items())[0]
     versioning = f"pyOHNLP:{pyohnlp_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
     return versioning
+
+def conv_time():
+    timestamp = datetime.datetime.fromtimestamp(time.time())
+    date = timestamp.date()
+    hour = timestamp.hour
+    minute = timestamp.minute
+    second = timestamp.minute
+    return f"{date}_{hour}:{minute}:{second}"
