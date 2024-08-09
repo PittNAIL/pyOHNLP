@@ -43,9 +43,11 @@ def main():
     ]
     target_matcher = nlp.get_pipe("medspacy_target_matcher")
 
-    for file in rule_files:
-        if file.endswith(".txt"):
-            target_matcher.add(util.compile_target_rules(file))
+#    for file in rule_files:
+#        if file.endswith(".txt"):
+#            target_matcher.add(util.compile_target_rules(file))
+
+    target_matcher.add(util.compile_target_rules(conf['ruleset_dir']))
 
     if "linux" in platform.lower():
         data_to_collate = collect_data(nlp)

@@ -70,14 +70,35 @@ def compile_regexp(file_lines):
     return combined_patterns
 
 
-def compile_target_rules(rule_path):
-    print(f"Getting matcher rules from {rule_path}")
+def replace_patterns(input_string, pattern_dict):
+    def replacement(match):
+        key = match.group(1)
+        return pattern_dict.get(key, match.group(0))
+    return re.sub(r'%(\w+)', replacement, input_string)
+
+
+def compile_target_rules(ruleset_dir):
+    print(f"Getting matcher rules from {ruleset_dir}")
+    pattern_dict = {}
+    for file in os.listdir(f"{ruleset_dir}/regexp"):
+        with open(f"{ruleset_dir}/regexp/{file}", "r") as f:
+            rules = f.read().splitlines()
+        rules_pattern = compile_regexp(rules)
+        rulename = file.split("_")[-1].split('.txt')[0]
+        pattern_dict[rulename] = rules_pattern
     target_rules = []
-    with open(rule_path, 'r') as f:
-        rulez = f.read().splitlines()
-    rules_pattern = compile_regexp(rulez)
-    rulename = rule_path.split("_")[-1].split('.txt')[0]
-    target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rules_pattern}"))
+    with open(f"{ruleset_dir}/rules/resources_rules_matchrules.txt", "r") as f:
+        matchers = f.readlines()
+    for matchy in matchers:
+        if ',' in matchy:
+            regexp_idx = matchy.find('REGEXP')
+            loc_idx = matchy.find('LOCATION')
+            save = matchy[regexp_idx+7:loc_idx-1]
+            save = replace_patterns(save, pattern_dict)
+            rulename = matchy.split('=')[-1].replace('"', '').replace('\n', '')
+            save = save.replace('"', '')
+            target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{save}"))
+    print(target_rules)
     return target_rules
 
 
@@ -133,5 +154,9 @@ def conv_time():
     date = timestamp.date()
     hour = timestamp.hour
     minute = timestamp.minute
-    second = timestamp.minute
-    return f"{date}_{hour}:{minute}:{second}"
+    if minute < 10:
+        minute = '0' + str(minute)
+    second = timestamp.second
+    if second < 10:
+        second = '0' + str(second)
+    return f"{date}_{hour}_{minute}_{second}"
