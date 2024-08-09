@@ -2,4 +2,8 @@
 #
 python ./gui/root_window.py
 
-python main.py --db_conf ./user_conf.json --file_path /home/jordan/Downloads/eval_files/HOUSING_DATA_GOLDSTANDARD.csv
+echo What is the path of the file/folder you want to run pyOHNLP on?
+
+read file_dir
+
+python main.py --db_conf ./user_conf.json --file_path $file_dir

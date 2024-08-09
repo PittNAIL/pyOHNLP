@@ -196,8 +196,6 @@ def collect_data(nlp):
                 data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
             elif args.file_path.endswith(".zip"):
-                #TODO
-                print("TODO")
                 unzip_file(args.file_path, temp_dest_for_zip)
                 texts = []
                 for file in os.listdir('./TEMPDIR'):
@@ -205,7 +203,6 @@ def collect_data(nlp):
                         with open(os.path.join("./TEMPDIR", file), "r") as f:
                             txt = f.read()
                         texts.append((txt, file, nlp, shared_dtc, None, file))
-                        print(len(texts))
 
                     if args.file_path.endswith(".csv"):
                         chunk_size = 1000

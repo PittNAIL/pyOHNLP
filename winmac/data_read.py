@@ -8,7 +8,10 @@ import pandas as pd
 import sqlite3
 
 from winmac.util import parse_args, set_extensions, get_versioning
-from winmac.util import quiet_fix
+from winmac.util import quiet_fix, clean_extract, unzip_file
+
+temp_dest_for_zip = "../TEMPDIR"
+
 
 CONTEXT_ATTRS = {
     "NEG": {"is_negated": True},
@@ -195,6 +198,36 @@ def collect_data(nlp):
                     ]
                     pool = multiprocessing.Pool(processes=num_processes)
                     pool.map(process_records, args_list)
+
+            elif args.file_path.endswith(".zip"):
+                unzip_file(args.file_path, temp_dest_for_zip)
+                texts = []
+                for file in os.listdir('./TEMPDIR'):
+                    if file.endswith('.txt'):
+                        with open(os.path.join("./TEMPDIR", file), "r") as f:
+                            txt = f.read()
+                        texts.append((txt, file, nlp, shared_dtc, None, file))
+
+                    if args.file_path.endswith(".csv"):
+                        chunk_size = 1000
+                        for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
+                            note_text = [
+                                (
+                                    row[row_to_read],
+                                    {md: row[md] for md in metadata} if metadata else None,
+                                    idx,
+                                )
+                                    for idx, row in chunk.iterrows()
+                                ]
+                            args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1], text[2])
+                                for text in note_text]
+                            texts = texts + args_list
+
+                pool = multiprocessing.Pool(processes=num_processes)
+                pool.map(process_records, texts)
+                data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
+                clean_extract(temp_dest_for_zip)
+
             else:
                 raise ValueError(".zip compatibility not yet implemented.")
 

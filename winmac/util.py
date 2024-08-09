@@ -3,6 +3,9 @@ import os
 import json
 import tqdm
 import medspacy
+import re
+import subprocess
+import shutil
 
 import pandas as pd
 
@@ -66,18 +69,51 @@ def quiet_get_context_rules(CONTEXT_FILE):
     return context_rules_list
 
 
-def quiet_compile_target_rules(rule_path):
-    with open(rule_path, "r") as f:
-        rules = f.readlines()
+def compile_regexp(file_lines):
+    patterns = []
+    for line in file_lines:
+        line = line.strip()
+        if not line:
+            continue
+        if re.search(r'[.*+?^${}()|[\]\\]', line):
+            patterns.append(f"({line})")
+        else:
+            esc = re.escape(line)
+            patterns.append(f"({esc})")
+    combined_patterns = '|'.join(patterns)
+    return combined_patterns
+
+
+def replace_patterns(input_string, pattern_dict):
+    def replacement(match):
+        key = match.group(1)
+        return pattern_dict.get(key, match.group(0))
+    return re.sub(r'%(\w+)', replacement, input_string)
+
+
+def quiet_compile_target_rules(ruleset_dir):
+    print(f"Getting matcher rules from {ruleset_dir}")
+    pattern_dict = {}
+    for file in os.listdir(f"{ruleset_dir}/regexp"):
+        with open(f"{ruleset_dir}/regexp/{file}", "r") as f:
+            rules = f.read().splitlines()
+        rules_pattern = compile_regexp(rules)
+        rulename = file.split("_")[-1].split('.txt')[0]
+        pattern_dict[rulename] = rules_pattern
     target_rules = []
-    for line in rules:
-        rule = line.strip()
-        if "_re" in rule_path:
-            rulename = rule_path.split("_re")[-1].split(".txt")[0]
-        elif "/" in rule_path:
-            rulename = rule_path.split("/")[-1].split(".txt")[0]
-        target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{rule}"))
+    with open(f"{ruleset_dir}/rules/resources_rules_matchrules.txt", "r") as f:
+        matchers = f.readlines()
+    for matchy in matchers:
+        if ',' in matchy:
+            regexp_idx = matchy.find('REGEXP')
+            loc_idx = matchy.find('LOCATION')
+            save = matchy[regexp_idx+7:loc_idx-1]
+            save = replace_patterns(save, pattern_dict)
+            rulename = matchy.split('=')[-1].replace('"', '').replace('\n', '')
+            save = save.replace('"', '')
+            target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{save}"))
     return target_rules
+
 
 
 def compile_target_rules(rule_path):
@@ -194,3 +230,24 @@ def quiet_fix():
     target_matcher = nlp.get_pipe("medspacy_target_matcher")
     for file in rule_files:
         target_matcher.add(quiet_compile_target_rules(file))
+
+def conv_time():
+    timestamp = datetime.datetime.fromtimestamp(time.time())
+    date = timestamp.date()
+    hour = timestamp.hour
+    minute = timestamp.minute
+    if minute < 10:
+        minute = '0' + str(minute)
+    second = timestamp.second
+    if second < 10:
+        second = '0' + str(second)
+    return f"{date}_{hour}_{minute}_{second}"
+
+def unzip_file(zip_file, extract_dir):
+    unzip_cmd = f"unzip -q {zip_file} -d {extract_dir}"
+    subprocess.run(unzip_cmd, shell=True)
+    print(f"Extracted {zip_file}")
+
+def clean_extract(extract_dir):
+    shutil.rmtree(extract_dir)
+    print("Removed extract file")
