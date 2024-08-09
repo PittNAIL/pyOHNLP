@@ -8,7 +8,7 @@ import sqlite3
 
 import pandas as pd
 
-from util import parse_args, get_versioning
+from util import parse_args, get_versioning, unzip_file, clean_extract
 
 args = parse_args()
 batch_size = 1000
@@ -18,6 +18,7 @@ num_processes = multiprocessing.cpu_count()
 
 version = get_versioning("versions.json", args.db_conf)
 
+temp_dest_for_zip = "./TEMPDIR"
 
 def append_ent_data(ent, source, md: None, idx):
     if ent._.is_negated:
@@ -194,8 +195,40 @@ def collect_data(nlp):
                     pool.join()
                 data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
 
+            elif args.file_path.endswith(".zip"):
+                #TODO
+                print("TODO")
+                unzip_file(args.file_path, temp_dest_for_zip)
+                texts = []
+                for file in os.listdir('./TEMPDIR'):
+                    if file.endswith('.txt'):
+                        with open(os.path.join("./TEMPDIR", file), "r") as f:
+                            txt = f.read()
+                        texts.append((txt, file, nlp, shared_dtc, None, file))
+                        print(len(texts))
+
+                    if args.file_path.endswith(".csv"):
+                        chunk_size = 1000
+                        for chunk in pd.read_csv(args.file_path, chunksize=chunk_size):
+                            note_text = [
+                                (
+                                    row[row_to_read],
+                                    {md: row[md] for md in metadata} if metadata else None,
+                                    idx,
+                                )
+                                    for idx, row in chunk.iterrows()
+                                ]
+                            args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1], text[2])
+                                for text in note_text]
+                            texts = texts + args_list
+
+                pool = multiprocessing.Pool(processes=num_processes)
+                pool.map(process_records, texts)
+                data_to_collate = {key: list(value) for key, value in shared_dtc.items()}
+                clean_extract(temp_dest_for_zip)
+
             else:
-                raise ValueError(".zip compatibility not yet implemented.")
+                raise ValueError("Only .zip, .csv, and folder compatibility implemented.")
 
     if (args.db_conf is not None) & (args.file_path is None):
         if os.path.isfile(args.db_conf):

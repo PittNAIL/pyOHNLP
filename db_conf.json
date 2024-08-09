@@ -18,7 +18,7 @@
     "to_table": "raw.bg_data",
     "to_csv":"True"
 },
-"ruleset_dir": "/home/jordan/git/pyOHNLP/RULESETS/SDOH_FINAL/",
+"ruleset_dir": "/home/jordan/git/pyOHNLP/RULESETS/capecitabine_rules_v3/",
 "enact":"False"
 }
 

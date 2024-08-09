@@ -3,6 +3,8 @@ import datetime
 import os
 import json
 import re
+import subprocess
+import shutil
 import time
 import tqdm
 
@@ -160,3 +162,12 @@ def conv_time():
     if second < 10:
         second = '0' + str(second)
     return f"{date}_{hour}_{minute}_{second}"
+
+def unzip_file(zip_file, extract_dir):
+    unzip_cmd = f"unzip -q {zip_file} -d {extract_dir}"
+    subprocess.run(unzip_cmd, shell=True)
+    print(f"Extracted {zip_file}")
+
+def clean_extract(extract_dir):
+    shutil.rmtree(extract_dir)
+    print("Removed extract file")
