@@ -20,6 +20,7 @@ version = get_versioning("versions.json", args.db_conf)
 
 temp_dest_for_zip = "./TEMPDIR"
 
+
 def append_ent_data(ent, source, md: None, idx):
     if ent._.is_negated:
         certainty = "Negated"
@@ -198,8 +199,8 @@ def collect_data(nlp):
             elif args.file_path.endswith(".zip"):
                 unzip_file(args.file_path, temp_dest_for_zip)
                 texts = []
-                for file in os.listdir('./TEMPDIR'):
-                    if file.endswith('.txt'):
+                for file in os.listdir("./TEMPDIR"):
+                    if file.endswith(".txt"):
                         with open(os.path.join("./TEMPDIR", file), "r") as f:
                             txt = f.read()
                         texts.append((txt, file, nlp, shared_dtc, None, file))
@@ -213,10 +214,12 @@ def collect_data(nlp):
                                     {md: row[md] for md in metadata} if metadata else None,
                                     idx,
                                 )
-                                    for idx, row in chunk.iterrows()
-                                ]
-                            args_list = [(text[0], args.file_path, nlp, shared_dtc, text[1], text[2])
-                                for text in note_text]
+                                for idx, row in chunk.iterrows()
+                            ]
+                            args_list = [
+                                (text[0], args.file_path, nlp, shared_dtc, text[1], text[2])
+                                for text in note_text
+                            ]
                             texts = texts + args_list
 
                 pool = multiprocessing.Pool(processes=num_processes)

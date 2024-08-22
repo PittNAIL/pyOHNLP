@@ -5,6 +5,7 @@ import os
 from tkinter import ttk
 from tkinter import filedialog
 
+
 def open_directory(root):
     directory = filedialog.askdirectory()
     if directory:
@@ -20,17 +21,17 @@ def load_config(file, root):
     def handle_click(event):
         read_from = {
             "read_from": {
-            "db_type": dbt_entry.get(),
-            "database": db_entry.get(),
-            "user": user_entry.get(),
-            "password": pass_entry.get(),
-            "host": host_entry.get(),
-            "input_table": input_table_entry.get(),
-            "text_col": text_entry.get(),
-            "id_col": id_entry.get(),
-            "meta_data": [metadata_entry.get()],
+                "db_type": dbt_entry.get(),
+                "database": db_entry.get(),
+                "user": user_entry.get(),
+                "password": pass_entry.get(),
+                "host": host_entry.get(),
+                "input_table": input_table_entry.get(),
+                "text_col": text_entry.get(),
+                "id_col": id_entry.get(),
+                "meta_data": [metadata_entry.get()],
+            }
         }
-    }
 
         for widget in root.winfo_children():
             widget.destroy()
@@ -82,17 +83,17 @@ def load_config(file, root):
     metadata_label.pack()
     metadata_entry.pack()
     button.pack()
-    read_from = config['read_from']
+    read_from = config["read_from"]
 
-    dbt_entry.insert(0, config.get("db_type", read_from['db_type']))
-    db_entry.insert(0, config.get("db", read_from['database']))
-    user_entry.insert(0, config.get("user", read_from['user']))
-    pass_entry.insert(0, config.get("password", read_from['password']))
-    host_entry.insert(0, config.get("host", read_from['host']))
-    input_table_entry.insert(0, config.get("input_table", read_from['input_table']))
-    text_entry.insert(0, config.get("text", read_from['text_col']))
-    id_entry.insert(0, config.get("id", read_from['id_col']))
-    metadata_entry.insert(0, config.get("metadata", read_from['meta_data']))
+    dbt_entry.insert(0, config.get("db_type", read_from["db_type"]))
+    db_entry.insert(0, config.get("db", read_from["database"]))
+    user_entry.insert(0, config.get("user", read_from["user"]))
+    pass_entry.insert(0, config.get("password", read_from["password"]))
+    host_entry.insert(0, config.get("host", read_from["host"]))
+    input_table_entry.insert(0, config.get("input_table", read_from["input_table"]))
+    text_entry.insert(0, config.get("text", read_from["text_col"]))
+    id_entry.insert(0, config.get("id", read_from["id_col"]))
+    metadata_entry.insert(0, config.get("metadata", read_from["meta_data"]))
     return config
 
 
@@ -176,16 +177,16 @@ def create_write_to(root, data, config):
     enact_option_entry.pack()
     browse_button.pack()
     button.pack()
-    write_to = config['write_to']
-    ruleset_dir = config['ruleset_dir']
-    enact = config['enact']
+    write_to = config["write_to"]
+    ruleset_dir = config["ruleset_dir"]
+    enact = config["enact"]
 
-    dbt_entry.insert(0, config.get("db_type", write_to['db_type']))
-    db_entry.insert(0, config.get("db", write_to['database']))
-    user_entry.insert(0, config.get("user", write_to['user']))
-    pass_entry.insert(0, config.get("password", write_to['password']))
-    host_entry.insert(0, config.get("host", write_to['host']))
-    to_table_entry.insert(0, config.get("input_table", write_to['to_table']))
-    to_csv_entry.insert(0, config.get("text", write_to['to_csv']))
+    dbt_entry.insert(0, config.get("db_type", write_to["db_type"]))
+    db_entry.insert(0, config.get("db", write_to["database"]))
+    user_entry.insert(0, config.get("user", write_to["user"]))
+    pass_entry.insert(0, config.get("password", write_to["password"]))
+    host_entry.insert(0, config.get("host", write_to["host"]))
+    to_table_entry.insert(0, config.get("input_table", write_to["to_table"]))
+    to_csv_entry.insert(0, config.get("text", write_to["to_csv"]))
     ruleset_combobox.insert(0, config.get("id", ruleset_dir))
     enact_option_entry.insert(0, config.get("metadata", enact))

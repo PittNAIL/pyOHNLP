@@ -1,6 +1,5 @@
 import json
 import medspacy
-import os
 import util
 import platform
 
@@ -38,16 +37,9 @@ def main():
     context = nlp.add_pipe("medspacy_context", config={"rules": None, "span_attrs": CONTEXT_ATTRS})
     context.add(context_rules_list)
 
-    rule_files = [
-        os.path.join(conf["ruleset_dir"], file) for file in os.listdir(conf["ruleset_dir"])
-    ]
     target_matcher = nlp.get_pipe("medspacy_target_matcher")
 
-#    for file in rule_files:
-#        if file.endswith(".txt"):
-#            target_matcher.add(util.compile_target_rules(file))
-
-    target_matcher.add(util.compile_target_rules(conf['ruleset_dir']))
+    target_matcher.add(util.compile_target_rules(conf["ruleset_dir"]))
 
     if "linux" in platform.lower():
         data_to_collate = collect_data(nlp)

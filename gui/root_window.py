@@ -19,7 +19,7 @@ def menu(root):
     menubar = tk.Menu(root)
 
     file_menu = tk.Menu(menubar, tearoff=0)
-    file_menu.add_command(label="Load Existing Config", command= lambda: open_directory(root))
+    file_menu.add_command(label="Load Existing Config", command=lambda: open_directory(root))
     file_menu.add_separator()
     file_menu.add_command(label="Exit", command=root.quit)
     menubar.add_cascade(label="File", menu=file_menu)

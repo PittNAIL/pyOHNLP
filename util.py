@@ -57,18 +57,19 @@ def get_context_rules(CONTEXT_FILE):
         )
     return context_rules_list
 
+
 def compile_regexp(file_lines):
     patterns = []
     for line in file_lines:
         line = line.strip()
         if not line:
             continue
-        if re.search(r'[.*+?^${}()|[\]\\]', line):
+        if re.search(r"[.*+?^${}()|[\]\\]", line):
             patterns.append(f"({line})")
         else:
             esc = re.escape(line)
             patterns.append(f"({esc})")
-    combined_patterns = '|'.join(patterns)
+    combined_patterns = "|".join(patterns)
     return combined_patterns
 
 
@@ -76,7 +77,8 @@ def replace_patterns(input_string, pattern_dict):
     def replacement(match):
         key = match.group(1)
         return pattern_dict.get(key, match.group(0))
-    return re.sub(r'%(\w+)', replacement, input_string)
+
+    return re.sub(r"%(\w+)", replacement, input_string)
 
 
 def compile_target_rules(ruleset_dir):
@@ -86,19 +88,19 @@ def compile_target_rules(ruleset_dir):
         with open(f"{ruleset_dir}/regexp/{file}", "r") as f:
             rules = f.read().splitlines()
         rules_pattern = compile_regexp(rules)
-        rulename = file.split("_")[-1].split('.txt')[0]
+        rulename = file.split("_")[-1].split(".txt")[0]
         pattern_dict[rulename] = rules_pattern
     target_rules = []
     with open(f"{ruleset_dir}/rules/resources_rules_matchrules.txt", "r") as f:
         matchers = f.readlines()
     for matchy in matchers:
-        if ',' in matchy:
-            regexp_idx = matchy.find('REGEXP')
-            loc_idx = matchy.find('LOCATION')
-            save = matchy[regexp_idx+7:loc_idx-1]
+        if "," in matchy:
+            regexp_idx = matchy.find("REGEXP")
+            loc_idx = matchy.find("LOCATION")
+            save = matchy[regexp_idx + 7 : loc_idx - 1]
             save = replace_patterns(save, pattern_dict)
-            rulename = matchy.split('=')[-1].replace('"', '').replace('\n', '')
-            save = save.replace('"', '')
+            rulename = matchy.split("=")[-1].replace('"', "").replace("\n", "")
+            save = save.replace('"', "")
             target_rules.append(TargetRule(f"{rulename}", "PROBLEM", pattern=rf"{save}"))
     print(target_rules)
     return target_rules
@@ -151,22 +153,25 @@ def get_versioning(software, config=None):
     versioning = f"pyOHNLP:{pyohnlp_version}|ConText:{context_version}|Ruleset:{ruleset_version}"
     return versioning
 
+
 def conv_time():
     timestamp = datetime.datetime.fromtimestamp(time.time())
     date = timestamp.date()
     hour = timestamp.hour
     minute = timestamp.minute
     if minute < 10:
-        minute = '0' + str(minute)
+        minute = "0" + str(minute)
     second = timestamp.second
     if second < 10:
-        second = '0' + str(second)
+        second = "0" + str(second)
     return f"{date}_{hour}_{minute}_{second}"
+
 
 def unzip_file(zip_file, extract_dir):
     unzip_cmd = f"unzip -q {zip_file} -d {extract_dir}"
     subprocess.run(unzip_cmd, shell=True)
     print(f"Extracted {zip_file}")
+
 
 def clean_extract(extract_dir):
     shutil.rmtree(extract_dir)
